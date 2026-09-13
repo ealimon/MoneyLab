@@ -1,0 +1,6 @@
+{
+  "name": "MoneyLab",
+  "description": "An interactive middle school financial simulation lab featuring 10 hands-on modules, real-world budgeting, stock market trading, tax paystubs, compound interest calculators, and companion worksheets.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
