@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Check, X, Award, ArrowRight, Sparkles, AlertCircle, RefreshCw, Shuffle } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Module, QuizQuestion } from "../types";
+import { playSuccessChime } from "../utils/audio";
 
 interface ModuleQuizProps {
   module: Module;
@@ -75,6 +76,7 @@ export default function ModuleQuiz({ module, onComplete }: ModuleQuizProps) {
     setHasSubmitted(true);
     if (selectedAnswerIdx === currentQuestion.correctAnswerIndex) {
       setScore((prev) => prev + 1);
+      playSuccessChime();
     }
   };
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { 
   Coins, Award, BookOpen, Star, RefreshCw, Sparkles, ChevronRight, CheckCircle,
   GraduationCap, Play, Lock, AlertCircle, Sparkle, ArrowLeft, Printer, Flame,
-  FlaskConical, Zap
+  FlaskConical, Zap, Volume2, VolumeX
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -19,6 +19,12 @@ import {
   recordActivityForToday, 
   getCurrentWeekDays 
 } from "./utils/streakUtils";
+import { 
+  playPopSound, 
+  playSuccessChime, 
+  isAudioMuted, 
+  toggleAudioMuted 
+} from "./utils/audio";
 
 const STORAGE_KEY = "finance_quest_academy_progress";
 
@@ -47,6 +53,26 @@ export default function App() {
   const [gradeFilter, setGradeFilter] = useState<"all" | "gr6" | "gr7" | "gr8">("all");
   const [isStreakModalOpen, setIsStreakModalOpen] = useState(false);
   const [isCertificateModalOpen, setIsCertificateModalOpen] = useState(false);
+  const [isMuted, setIsMuted] = useState<boolean>(() => isAudioMuted());
+
+  // Attach global tactile click feedback for tactile wooden pop sound
+  useEffect(() => {
+    const handleDocumentClick = (e: MouseEvent) => {
+      const target = (e.target as HTMLElement)?.closest("button, [role='button'], input[type='button'], input[type='submit']");
+      if (target) {
+        // Skip audio toggle itself to avoid playing click before mute updates
+        if ((target as HTMLElement).id === "audio-toggle-btn") return;
+        playPopSound();
+      }
+    };
+    document.addEventListener("click", handleDocumentClick, { passive: true });
+    return () => document.removeEventListener("click", handleDocumentClick);
+  }, []);
+
+  const handleToggleAudio = () => {
+    const next = toggleAudioMuted();
+    setIsMuted(next);
+  };
 
   // Load progress from LocalStorage on mount & evaluate streak
   useEffect(() => {
@@ -174,6 +200,7 @@ export default function App() {
       badges: updatedBadges
     });
 
+    playSuccessChime();
     setModuleStage("complete");
   };
 
@@ -218,6 +245,28 @@ export default function App() {
           {/* Gamified Stat Meters & Controls */}
           <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end w-full md:w-auto">
             
+            {/* Audio Toggle (Wooden Bubble Pop / Mute) */}
+            <button
+              id="audio-toggle-btn"
+              onClick={handleToggleAudio}
+              className={`border-2 border-black px-3 py-1.5 rounded-2xl font-black text-xs sm:text-sm shadow-[2px_2px_0px_0px_#000] flex items-center gap-1.5 font-display transition-all active:translate-y-0.5 cursor-pointer ${
+                isMuted ? "bg-slate-100 text-slate-600 hover:bg-slate-200" : "bg-emerald-100 text-emerald-950 hover:bg-emerald-200"
+              }`}
+              title={isMuted ? "Audio is Muted — Click to Enable Sound" : "Audio is Enabled — Click to Mute"}
+            >
+              {isMuted ? (
+                <>
+                  <VolumeX className="w-4 h-4 text-rose-600" />
+                  <span className="hidden sm:inline text-xs text-rose-700 font-bold">MUTED</span>
+                </>
+              ) : (
+                <>
+                  <Volume2 className="w-4 h-4 text-emerald-700" />
+                  <span className="hidden sm:inline text-xs text-emerald-800 font-bold">SOUND ON</span>
+                </>
+              )}
+            </button>
+
             {/* Stars / Coins Balance */}
             <div className="bg-[#fde047] border-2 border-black text-black px-3.5 py-1.5 rounded-2xl font-black text-xs sm:text-sm shadow-[2px_2px_0px_0px_#000] flex items-center gap-1.5 font-display">
               <Star className="w-4 h-4 fill-amber-500 text-black" />
@@ -227,7 +276,10 @@ export default function App() {
             {/* Certificate Button */}
             <button
               id="certificate-btn"
-              onClick={() => setIsCertificateModalOpen(true)}
+              onClick={() => {
+                playSuccessChime();
+                setIsCertificateModalOpen(true);
+              }}
               className="bg-[#fcd34d] hover:bg-[#fbbf24] border-2 border-black text-black px-3.5 py-1.5 rounded-2xl font-black text-xs sm:text-sm shadow-[2px_2px_0px_0px_#000] flex items-center gap-1.5 font-display transition-all active:translate-y-0.5 cursor-pointer"
               title="View your official Middle School Financial Literacy Diploma"
             >
