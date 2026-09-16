@@ -264,7 +264,7 @@ export default function App() {
       </header>
 
       {/* MAIN CONTAINER */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-1 w-full space-y-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-1 w-full space-y-8 print:p-0 print:m-0 print:max-w-none print:w-full print:space-y-0">
         
         {/* ========================================================
             PLAYGROUND VIEW: 10 MODULES EVENLY DISPLAYED IN 2-COL GRID
@@ -488,10 +488,10 @@ export default function App() {
             FOCUSED ACTIVITY VIEW: WHEN USER CLICKS PLAY OR WORKSHEET
             ======================================================== */}
         {activeTab === "modules" && viewMode === "activity" && (
-          <div className="space-y-6">
+          <div className="space-y-6 print:space-y-0">
             
             {/* TOP NAVIGATION CONTROLS */}
-            <div className="bg-white border-4 border-black rounded-2xl p-4 shadow-[4px_4px_0px_0px_#000] flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="bg-white border-4 border-black rounded-2xl p-4 shadow-[4px_4px_0px_0px_#000] flex flex-col md:flex-row items-center justify-between gap-4 print:hidden">
               
               {/* Back to Playground Button */}
               <button
@@ -538,7 +538,7 @@ export default function App() {
             {/* MAIN ACTIVITY CONTENT */}
             <div>
               {workspaceTab === "worksheet" ? (
-                <div className="bg-white border-4 border-black rounded-3xl p-6 sm:p-8 shadow-[6px_6px_0px_0px_#000]">
+                <div className="bg-white border-4 border-black rounded-3xl p-6 sm:p-8 shadow-[6px_6px_0px_0px_#000] print:border-0 print:p-0 print:shadow-none print:rounded-none print:bg-transparent">
                   <ModuleWorksheet
                     moduleId={activeModule.id}
                     moduleTitle={activeModule.title}
@@ -641,7 +641,7 @@ export default function App() {
             </div>
 
             {/* BOTTOM NAV BAR */}
-            <div className="flex items-center justify-between gap-4 pt-2">
+            <div className="flex items-center justify-between gap-4 pt-2 print:hidden">
               <button
                 onClick={handleBackToPlayground}
                 className="bg-white hover:bg-slate-100 text-black font-black text-xs sm:text-sm px-4 py-2.5 rounded-2xl border-2 border-black shadow-[2px_2px_0px_0px_#000] flex items-center gap-1.5 cursor-pointer font-display"
