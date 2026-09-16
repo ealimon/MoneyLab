@@ -11,11 +11,9 @@ import { ADVENTURE_MODULES, AdventureModuleConfig } from "./modulesConfig";
 import { UserProgress } from "./types";
 import ModuleInteractive from "./components/modules/ModuleInteractive";
 import ModuleQuiz from "./components/ModuleQuiz";
-import AvatarCustomizer from "./components/AvatarCustomizer";
 import FinnyChat from "./components/FinnyChat";
 import ModuleWorksheet from "./components/ModuleWorksheet";
 import StreakModal from "./components/StreakModal";
-import TpTCoverGenerator from "./components/TpTCoverGenerator";
 import JuniorSaverCertificateModal from "./components/JuniorSaverCertificateModal";
 import { 
   evaluateUserStreakOnLoad, 
@@ -42,7 +40,7 @@ const DEFAULT_PROGRESS: UserProgress = {
 
 export default function App() {
   const [progress, setProgress] = useState<UserProgress>(DEFAULT_PROGRESS);
-  const [activeTab, setActiveTab] = useState<"modules" | "badges" | "avatar" | "tpt-cover">("modules");
+  const [activeTab, setActiveTab] = useState<"modules" | "badges">("modules");
   const [viewMode, setViewMode] = useState<"playground" | "activity">("playground");
   const [selectedModuleId, setSelectedModuleId] = useState<string>("m1");
   const [workspaceTab, setWorkspaceTab] = useState<"game" | "worksheet">("game");
@@ -401,21 +399,9 @@ export default function App() {
               <div className="flex items-center gap-2 w-full md:w-auto justify-end">
                 <button
                   onClick={() => setActiveTab("badges")}
-                  className="bg-slate-100 hover:bg-slate-200 border-2 border-black text-black px-3 py-1.5 rounded-xl text-xs font-black font-display shadow-[2px_2px_0px_0px_#000] cursor-pointer"
+                  className="bg-slate-100 hover:bg-slate-200 border-2 border-black text-black px-3.5 py-1.5 rounded-xl text-xs font-black font-display shadow-[2px_2px_0px_0px_#000] cursor-pointer"
                 >
                   Badges 🏅
-                </button>
-                <button
-                  onClick={() => setActiveTab("avatar")}
-                  className="bg-slate-100 hover:bg-slate-200 border-2 border-black text-black px-3 py-1.5 rounded-xl text-xs font-black font-display shadow-[2px_2px_0px_0px_#000] cursor-pointer"
-                >
-                  Shop 👕
-                </button>
-                <button
-                  onClick={() => setActiveTab("tpt-cover")}
-                  className="bg-amber-300 hover:bg-amber-400 border-2 border-black text-black px-3 py-1.5 rounded-xl text-xs font-black font-display shadow-[2px_2px_0px_0px_#000] cursor-pointer"
-                >
-                  TPT Cover 🖼️
                 </button>
               </div>
             </div>
@@ -714,52 +700,6 @@ export default function App() {
                 );
               })}
             </div>
-          </div>
-        )}
-
-        {/* ========================================================
-            TAB 3: MASCOT & AVATAR SHOP
-            ======================================================== */}
-        {activeTab === "avatar" && (
-          <div className="space-y-6">
-            <div className="bg-white border-4 border-black rounded-3xl p-6 sm:p-8 shadow-[6px_6px_0px_0px_#000] flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="text-left">
-                <span className="text-xs font-black uppercase tracking-widest text-slate-500 font-display">Fin-Coin Fashion</span>
-                <h2 className="text-2xl sm:text-3xl font-black text-slate-950 font-display">Customize Your Mascot</h2>
-                <p className="text-xs sm:text-sm text-slate-600 font-bold mt-1">
-                  Dress up Finny the Owl with hats, sunglasses, and scholar robes!
-                </p>
-              </div>
-
-              <button
-                onClick={handleBackToPlayground}
-                className="bg-yellow-300 hover:bg-yellow-400 text-black border-2 border-black px-4 py-2 rounded-2xl font-black text-xs sm:text-sm font-display shadow-[2px_2px_0px_0px_#000] cursor-pointer"
-              >
-                Back to Activities 🗺️
-              </button>
-            </div>
-
-            <AvatarCustomizer 
-              progress={progress} 
-              onUpdateProgress={handleUpdateProgress} 
-            />
-          </div>
-        )}
-
-        {/* ========================================================
-            TAB 4: TPT STORE COVER GENERATOR
-            ======================================================== */}
-        {activeTab === "tpt-cover" && (
-          <div className="space-y-6">
-            <div className="flex justify-end">
-              <button
-                onClick={handleBackToPlayground}
-                className="bg-white hover:bg-slate-100 text-black border-2 border-black px-4 py-2 rounded-2xl font-black text-xs sm:text-sm font-display shadow-[2px_2px_0px_0px_#000] cursor-pointer"
-              >
-                Back to Activities 🗺️
-              </button>
-            </div>
-            <TpTCoverGenerator />
           </div>
         )}
 

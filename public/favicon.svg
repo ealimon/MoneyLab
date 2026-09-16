@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Neo-brutalist Offset Shadow -->
+  <rect x="7" y="7" width="52" height="52" rx="15" fill="#000000" />
+
+  <!-- Main Yellow Badge Container -->
+  <rect x="4" y="4" width="52" height="52" rx="15" fill="#FACC15" stroke="#000000" stroke-width="3.5" stroke-linejoin="round" />
+
+  <!-- Flask Liquid Level -->
+  <path d="M 20.8 37.5 L 16.6 44.5 C 16.1 45.4 16.8 46.5 17.8 46.5 L 42.2 46.5 C 43.2 46.5 43.9 45.4 43.4 44.5 L 39.2 37.5 Z" fill="#000000" fill-opacity="0.12" />
+
+  <!-- Conical Flask Body & Neck -->
+  <!-- Top Rim -->
+  <line x1="23" y1="14" x2="37" y2="14" stroke="#000000" stroke-width="3.5" stroke-linecap="round" />
+  
+  <!-- Flask Contour -->
+  <path d="M 26.5 14.5 V 23.5 L 16.5 43.5 C 15.6 45.3 16.9 47.5 18.9 47.5 H 41.1 C 43.1 47.5 44.4 45.3 43.5 43.5 L 33.5 23.5 V 14.5" stroke="#000000" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- Liquid Level Line -->
+  <line x1="20" y1="37.5" x2="40" y2="37.5" stroke="#000000" stroke-width="3" stroke-linecap="round" />
+
+  <!-- Science / Financial Spark Bubbles -->
+  <circle cx="27" cy="31" r="2" fill="#000000" />
+  <circle cx="33" cy="27.5" r="1.4" fill="#000000" />
+</svg>
