@@ -447,18 +447,18 @@ export default function App() {
                     {/* Footer: Action Buttons */}
                     <div className="flex items-center justify-between gap-3 pt-3 border-t-2 border-dashed border-slate-100">
                       <button
-                        id={`worksheet-btn-${adv.id}`}
-                        onClick={() => handleOpenWorksheet(adv.id)}
-                        className="bg-[#f472b6] hover:bg-[#f43f5e] text-black font-black text-xs sm:text-sm px-4 py-2.5 rounded-2xl border-2 border-black shadow-[2px_2px_0px_0px_#000] flex items-center gap-1.5 transition-all active:translate-y-0.5 cursor-pointer font-display"
-                      >
-                        <BookOpen className="w-4 h-4" /> WORKSHEET
-                      </button>
-                      <button
                         id={`play-btn-${adv.id}`}
                         onClick={() => handleOpenGame(adv.id)}
                         className={`${adv.actionBg} font-black text-xs sm:text-sm px-5 py-2.5 rounded-2xl font-display flex items-center gap-1.5 transition-all active:translate-y-0.5 cursor-pointer uppercase tracking-wider`}
                       >
                         {adv.actionLabel}
+                      </button>
+                      <button
+                        id={`worksheet-btn-${adv.id}`}
+                        onClick={() => handleOpenWorksheet(adv.id)}
+                        className="bg-[#f472b6] hover:bg-[#f43f5e] text-black font-black text-xs sm:text-sm px-4 py-2.5 rounded-2xl border-2 border-black shadow-[2px_2px_0px_0px_#000] flex items-center gap-1.5 transition-all active:translate-y-0.5 cursor-pointer font-display"
+                      >
+                        <BookOpen className="w-4 h-4" /> WORKSHEET
                       </button>
                     </div>
                   </div>

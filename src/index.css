@@ -38,8 +38,9 @@
     print-color-adjust: exact !important;
   }
 
-  html, body, #root {
+  html, body, #root, #root > div, main {
     background: #ffffff !important;
+    background-color: #ffffff !important;
     color: #000000 !important;
     margin: 0 !important;
     padding: 0 !important;

@@ -52,6 +52,25 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       options: ["True", "False"],
       correctAnswer: "True",
       explanation: "These are called commodity monies. Anything scarce and universally desired can temporarily act as currency!"
+    },
+    {
+      id: "q5",
+      type: "text",
+      question: "Trade Math: If 1 bushel of wheat is worth 4 chickens in trade, how many chickens would a farmer need to trade for 3 bushels of wheat?",
+      correctAnswer: "12 chickens",
+      explanation: "Multiply the bushels by the exchange rate: 3 bushels * 4 chickens = 12 chickens."
+    },
+    {
+      id: "q6",
+      type: "choice",
+      question: "What gives modern 'Fiat Currency' (such as US paper dollar bills) its purchasing power value?",
+      options: [
+        "Government backing and mutual public trust that it will always be accepted.",
+        "It is made of pure solid silver and gold threads.",
+        "Each dollar bill can be redeemed for a real chicken at the bank."
+      ],
+      correctAnswer: "Government backing and mutual public trust that it will always be accepted.",
+      explanation: "Fiat money has value because the government declares it legal tender and society mutually trusts it."
     }
   ],
   m2: [
@@ -88,6 +107,25 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       options: ["Hourly wage", "Salary", "Commission"],
       correctAnswer: "Salary",
       explanation: "A salary is a fixed annual sum, usually paid weekly or monthly, rather than an hourly wage."
+    },
+    {
+      id: "q5",
+      type: "text",
+      question: "Paycheck Math: Maria earns $20/hr and works 15 hours this week. If $45 is deducted for taxes and insurance, what is her Net Pay?",
+      correctAnswer: "$255",
+      explanation: "Gross Pay = 15 hrs * $20 = $300. Net Pay = $300 - $45 deductions = $255 take-home pay."
+    },
+    {
+      id: "q6",
+      type: "choice",
+      question: "Which of the following is considered an 'Employer-Provided Benefit' alongside your base wage?",
+      options: [
+        "Health insurance coverage and 401(k) retirement contributions.",
+        "The mandatory brand of sneakers you must wear.",
+        "A homework assignment due every Friday."
+      ],
+      correctAnswer: "Health insurance coverage and 401(k) retirement contributions.",
+      explanation: "Benefits are valuable non-wage compensations like health insurance, paid time off, and retirement matching."
     }
   ],
   m3: [
@@ -123,6 +161,25 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       question: "Why is it critical to build and maintain an 'Emergency Fund' in your savings account?",
       correctAnswer: "To pay for unexpected life expenses without going into debt.",
       explanation: "Emergency funds cover surprises like phone repairs, medical bills, or job losses safely."
+    },
+    {
+      id: "q5",
+      type: "text",
+      question: "Budget Math: If your monthly net pay is $500, calculate the exact dollar target for your Needs (50%) and Savings (20%).",
+      correctAnswer: "Needs: $250, Savings: $100",
+      explanation: "Needs = 50% of $500 = $250. Savings = 20% of $500 = $100. (Wants would be $150)."
+    },
+    {
+      id: "q6",
+      type: "choice",
+      question: "If your monthly expenses exceed your income, which adjustment should you make first to balance your budget?",
+      options: [
+        "Cut back on non-essential Wants like dining out and gaming subscriptions.",
+        "Stop buying essential groceries.",
+        "Stop paying rent or utility bills."
+      ],
+      correctAnswer: "Cut back on non-essential Wants like dining out and gaming subscriptions.",
+      explanation: "Wants are flexible and non-essential, making them the quickest and safest place to trim your budget."
     }
   ],
   m4: [
@@ -159,6 +216,25 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       options: ["True", "False"],
       correctAnswer: "False",
       explanation: "Piggy banks do not pay interest. Only bank accounts, bonds, or investments compound your money."
+    },
+    {
+      id: "q5",
+      type: "text",
+      question: "Interest Math: If you put $200 in a high-yield savings account earning 5% annual interest, how much interest do you earn in Year 1?",
+      correctAnswer: "$10 interest",
+      explanation: "$200 * 0.05 = $10.00 in interest earned, giving a new total balance of $210."
+    },
+    {
+      id: "q6",
+      type: "choice",
+      question: "Using the financial shortcut 'Rule of 72' (Years to double = 72 ÷ Interest Rate), about how many years will it take money to double at 8% interest?",
+      options: [
+        "9 years (72 ÷ 8 = 9)",
+        "24 years",
+        "72 years"
+      ],
+      correctAnswer: "9 years (72 ÷ 8 = 9)",
+      explanation: "The Rule of 72 reveals that 72 divided by the 8% interest rate equals roughly 9 years to double."
     }
   ],
   m5: [
@@ -199,6 +275,25 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       ],
       correctAnswer: "It encourages you to buy items you didn't need or want just because of the perceived discount.",
       explanation: "If you spend money on things you didn't plan to buy, you aren't saving money—you are spending more!"
+    },
+    {
+      id: "q5",
+      type: "text",
+      question: "Unit Price Math: Cereal Brand X is 20oz for $5.00 ($0.25/oz). Brand Y is 10oz for $3.50 ($0.35/oz). How much do you save per ounce buying Brand X?",
+      correctAnswer: "$0.10 per ounce",
+      explanation: "Brand Y ($0.35) - Brand X ($0.25) = $0.10 saved per ounce on the larger box."
+    },
+    {
+      id: "q6",
+      type: "choice",
+      question: "What is the '24-Hour Rule' that smart shoppers use before making expensive non-essential purchases?",
+      options: [
+        "Waiting 24 hours to let emotional impulses cool down before deciding whether to buy.",
+        "Returning the product within 24 hours to get a free replacement.",
+        "Shopping only between midnight and 1:00 AM."
+      ],
+      correctAnswer: "Waiting 24 hours to let emotional impulses cool down before deciding whether to buy.",
+      explanation: "Taking 24 hours separates emotional impulses from genuine needs, preventing buyer's remorse."
     }
   ],
   m6: [
@@ -235,6 +330,25 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       options: ["True", "False"],
       correctAnswer: "True",
       explanation: "Debit cards are linked directly to your active checking account, removing funds almost instantly."
+    },
+    {
+      id: "q5",
+      type: "text",
+      question: "Ledger Math: Your checking account balance is $80. You spend $25 on shoes with your debit card, then deposit a $45 gift check. What is your new balance?",
+      correctAnswer: "$100",
+      explanation: "Starting $80 - $25 expense + $45 deposit = $100.00 ending balance."
+    },
+    {
+      id: "q6",
+      type: "choice",
+      question: "What independent U.S. government agency insures individual bank deposits up to $250,000 in case the bank fails?",
+      options: [
+        "FDIC (Federal Deposit Insurance Corporation)",
+        "The Federal Bureau of Investigation (FBI)",
+        "The Department of Motor Vehicles (DMV)"
+      ],
+      correctAnswer: "FDIC (Federal Deposit Insurance Corporation)",
+      explanation: "The FDIC guarantees your deposited money up to $250,000 per depositor if an insured bank goes bankrupt."
     }
   ],
   m7: [
@@ -271,6 +385,25 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       ],
       correctAnswer: "A very high, dangerous rate that will expand your debt quickly if unpaid.",
       explanation: "Credit cards have some of the highest interest rates in finance, making carrying debt extremely expensive."
+    },
+    {
+      id: "q5",
+      type: "text",
+      question: "Credit Card Math: If you charge a $60 dinner on your credit card and pay the full $60 statement before the monthly due date, how much interest is charged?",
+      correctAnswer: "$0.00 (Zero interest)",
+      explanation: "If you pay off your full statement balance on time each month, the grace period prevents any interest charges!"
+    },
+    {
+      id: "q6",
+      type: "choice",
+      question: "What is the primary operational difference between a Debit Card and a Credit Card?",
+      options: [
+        "A debit card withdraws your own existing bank funds, while a credit card borrows funds that must be repaid.",
+        "Debit cards only work in Canada.",
+        "Credit cards are only made of paper."
+      ],
+      correctAnswer: "A debit card withdraws your own existing bank funds, while a credit card borrows funds that must be repaid.",
+      explanation: "Debit is 'pay now with your money'; credit is 'pay later by taking a short-term bank loan'."
     }
   ],
   m8: [
@@ -311,6 +444,25 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       ],
       correctAnswer: "Supply and demand, driven by company earnings news, economy trends, and investor outlook.",
       explanation: "Prices change because buyers and sellers bid based on their expectations of the company's future value."
+    },
+    {
+      id: "q5",
+      type: "text",
+      question: "Stock Profit Math: You buy 5 shares of a robotics company at $20/share ($100 total). You sell them later at $26/share. What is your total profit?",
+      correctAnswer: "$30 profit",
+      explanation: "Sale total = 5 * $26 = $130. Profit = $130 - $100 = $30 (or $6 gain per share * 5 shares = $30)."
+    },
+    {
+      id: "q6",
+      type: "choice",
+      question: "What is an 'Index Fund' (or ETF) and why do financial advisors recommend it for young investors?",
+      options: [
+        "It bundles shares of hundreds of different companies together for instant, low-cost diversification.",
+        "It is a lottery ticket that guarantees 1000% returns.",
+        "It is an exclusive membership card for Wall Street executives."
+      ],
+      correctAnswer: "It bundles shares of hundreds of different companies together for instant, low-cost diversification.",
+      explanation: "An index fund spreads your investment across the whole market, dramatically reducing the risk of any single company failing."
     }
   ],
   m9: [
@@ -347,6 +499,25 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       options: ["True", "False"],
       correctAnswer: "False",
       explanation: "Anyone who earns wages is subject to federal, state, and payroll taxes, regardless of age!"
+    },
+    {
+      id: "q5",
+      type: "text",
+      question: "Sales Tax Math: You purchase a $30 backpack in a city with a 6% sales tax. What is the total cost at checkout?",
+      correctAnswer: "$31.80",
+      explanation: "Tax amount = $30 * 0.06 = $1.80. Total price at register = $30 + $1.80 = $31.80."
+    },
+    {
+      id: "q6",
+      type: "choice",
+      question: "Every April, workers file an annual tax return with the IRS. What happens if you had more tax withheld from your paychecks than you actually owed?",
+      options: [
+        "The government sends you a Tax Refund check for the difference.",
+        "The government keeps the extra money as a permanent bonus.",
+        "You are sent to tax school on weekends."
+      ],
+      correctAnswer: "The government sends you a Tax Refund check for the difference.",
+      explanation: "A tax refund simply returns your own overpaid money back to your bank account."
     }
   ],
   m10: [
@@ -387,6 +558,25 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       ],
       correctAnswer: "It builds community connection, supports vital causes, and fosters healthy gratitude habits.",
       explanation: "Generosity expands your worldview, helps others survive, and establishes a balanced, positive connection with wealth."
+    },
+    {
+      id: "q5",
+      type: "text",
+      question: "Giving Budget Math: You earn $50 from weekend pet-sitting and allocate 10% to a local animal shelter. How much do you donate?",
+      correctAnswer: "$5.00",
+      explanation: "10% of $50 = 0.10 * $50 = $5.00 donated to the shelter."
+    },
+    {
+      id: "q6",
+      type: "choice",
+      question: "Why do wise donors check independent charity evaluators (like Charity Navigator) before making large contributions?",
+      options: [
+        "To ensure the non-profit spends the majority of donor money on its core cause rather than excessive administrative overhead.",
+        "To see if the charity hands out free televisions.",
+        "Because it is required by the fire department."
+      ],
+      correctAnswer: "To ensure the non-profit spends the majority of donor money on its core cause rather than excessive administrative overhead.",
+      explanation: "Evaluating charities ensures that your hard-earned money efficiently impacts real people and communities."
     }
   ]
 };
