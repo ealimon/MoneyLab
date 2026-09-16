@@ -682,8 +682,19 @@ export default function ModuleWorksheet({ moduleId, moduleTitle, moduleSubtitle,
       <div className="space-y-6 pt-2 print:space-y-3 print:pt-0">
         {questions.map((q, idx) => {
           const isCorrect = checkedAnswers[q.id];
+          const isQuestionThree = idx === 2;
+          const isQuestionFour = idx === 3;
           return (
-            <div key={q.id} className="space-y-3 print:space-y-1.5 print:break-inside-avoid print:page-break-inside-avoid print:mb-2.5 print:pb-2 print:border-b print:border-slate-200">
+            <div 
+              key={q.id} 
+              className={`space-y-3 print:space-y-1.5 print:break-inside-avoid print:page-break-inside-avoid print:border-b print:border-slate-200 ${
+                isQuestionThree 
+                  ? "mb-8 pb-5 border-b-2 border-dashed border-sky-200 print:mb-6 print:pb-4 print:border-slate-300" 
+                  : isQuestionFour
+                  ? "pt-2 print:pt-2 print:mb-2.5 print:pb-2"
+                  : "print:mb-2.5 print:pb-2"
+              }`}
+            >
               <p className="text-base sm:text-lg font-black text-sky-950 leading-relaxed font-display flex gap-2.5 print:text-slate-900 print:text-xs print:font-bold print:leading-snug">
                 <span className="bg-sky-100 text-sky-800 w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center shrink-0 text-xs sm:text-sm font-black print:bg-slate-100 print:text-slate-900 print:border print:border-slate-800 print:w-5 print:h-5 print:text-[10px] print:rounded">
                   {idx + 1}
