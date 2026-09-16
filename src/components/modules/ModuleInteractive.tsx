@@ -227,8 +227,8 @@ export default function ModuleInteractive({ module, onComplete, userCoins }: Mod
         title: "Large Croissant Order",
         scenario: "A local cafe orders 40 fresh croissants for their morning rush! How do you operate the bakery ovens?",
         options: [
-          { label: "Use precision timer & calibrated baking temperatures", bonus: 15, feedback: "Perfect golden croissants! The cafe owner tips $15 for stellar quality.", isQuality: true },
-          { label: "Crank oven heat to maximum to bake as fast as possible", bonus: 0, feedback: "Croissants were slightly burnt on top. No bonus earned.", isQuality: false }
+          { label: "Crank oven heat to maximum to bake as fast as possible", bonus: 0, feedback: "Croissants were slightly burnt on top. No bonus earned.", isQuality: false },
+          { label: "Use precision timer & calibrated baking temperatures", bonus: 15, feedback: "Perfect golden croissants! The cafe owner tips $15 for stellar quality.", isQuality: true }
         ]
       },
       {
@@ -245,8 +245,8 @@ export default function ModuleInteractive({ module, onComplete, userCoins }: Mod
         title: "3-Tier Birthday Cake",
         scenario: "A customer requests an elaborate custom birthday cake with intricate sugar decorations.",
         options: [
-          { label: "Craft detailed sugar decorations with care and precision", bonus: 25, feedback: "Customer was thrilled with the masterpiece and left a $25 tip!", isQuality: true },
-          { label: "Rush through decoration with basic standard frosting", bonus: 5, feedback: "Customer accepted it, leaving a small $5 tip.", isQuality: false }
+          { label: "Rush through decoration with basic standard frosting", bonus: 5, feedback: "Customer accepted it, leaving a small $5 tip.", isQuality: false },
+          { label: "Craft detailed sugar decorations with care and precision", bonus: 25, feedback: "Customer was thrilled with the masterpiece and left a $25 tip!", isQuality: true }
         ]
       }
     ],
@@ -265,8 +265,8 @@ export default function ModuleInteractive({ module, onComplete, userCoins }: Mod
         title: "Environmental Impact Report",
         scenario: "You are presenting clean energy initiatives and solar impact statistics to the town council.",
         options: [
-          { label: "Create clear, easy-to-read charts highlighting community savings", bonus: 30, feedback: "Council approved $10k in green grants & awarded a $30 merit bonus!", isQuality: true },
-          { label: "Present unorganized raw spreadsheets without summary visual charts", bonus: 0, feedback: "Council struggled to understand the data. No bonus awarded.", isQuality: false }
+          { label: "Present unorganized raw spreadsheets without summary visual charts", bonus: 0, feedback: "Council struggled to understand the data. No bonus awarded.", isQuality: false },
+          { label: "Create clear, easy-to-read charts highlighting community savings", bonus: 30, feedback: "Council approved $10k in green grants & awarded a $30 merit bonus!", isQuality: true }
         ]
       },
       {
@@ -285,8 +285,8 @@ export default function ModuleInteractive({ module, onComplete, userCoins }: Mod
         title: "Puppy Wellness Exam",
         scenario: "Barnaby the Golden Retriever puppy is visiting for his annual checkup and vaccinations.",
         options: [
-          { label: "Perform gentle full exam, weigh Barnaby, and reward him with treats", bonus: 25, feedback: "Barnaby was calm & happy! Pet owner left a 5-star review & $25 tip.", isQuality: true },
-          { label: "Rush the examination without calming treats or gentle handling", bonus: 0, feedback: "Barnaby whimpered and was frightened. No tip received.", isQuality: false }
+          { label: "Rush the examination without calming treats or gentle handling", bonus: 0, feedback: "Barnaby whimpered and was frightened. No tip received.", isQuality: false },
+          { label: "Perform gentle full exam, weigh Barnaby, and reward him with treats", bonus: 25, feedback: "Barnaby was calm & happy! Pet owner left a 5-star review & $25 tip.", isQuality: true }
         ]
       },
       {
@@ -303,8 +303,8 @@ export default function ModuleInteractive({ module, onComplete, userCoins }: Mod
         title: "Emergency Parrot Care",
         scenario: "A parrot swallowed a shiny metal button and needs immediate emergency care!",
         options: [
-          { label: "Perform digital X-ray imaging and gently extract the foreign object", bonus: 35, feedback: "Successfully saved the parrot! Grateful owner rewards a $35 emergency bonus.", isQuality: true },
-          { label: "Refer the patient to a clinic 45 minutes across town", bonus: 0, feedback: "Patient transferred elsewhere.", isQuality: false }
+          { label: "Refer the patient to a clinic 45 minutes across town", bonus: 0, feedback: "Patient transferred elsewhere.", isQuality: false },
+          { label: "Perform digital X-ray imaging and gently extract the foreign object", bonus: 35, feedback: "Successfully saved the parrot! Grateful owner rewards a $35 emergency bonus.", isQuality: true }
         ]
       }
     ],
@@ -323,8 +323,8 @@ export default function ModuleInteractive({ module, onComplete, userCoins }: Mod
         title: "Mobile Screen Redesign",
         scenario: "Redesigning the main game navigation menu for smaller mobile touchscreen displays.",
         options: [
-          { label: "Design touch-friendly large controls with haptic feedback responses", bonus: 40, feedback: "User satisfaction jumped 45%! Studio grants a $40 UX Award.", isQuality: true },
-          { label: "Keep tiny desktop buttons crammed on the phone screen", bonus: 0, feedback: "Players kept misclicking buttons.", isQuality: false }
+          { label: "Keep tiny desktop buttons crammed on the phone screen", bonus: 0, feedback: "Players kept misclicking buttons.", isQuality: false },
+          { label: "Design touch-friendly large controls with haptic feedback responses", bonus: 40, feedback: "User satisfaction jumped 45%! Studio grants a $40 UX Award.", isQuality: true }
         ]
       },
       {
@@ -332,16 +332,27 @@ export default function ModuleInteractive({ module, onComplete, userCoins }: Mod
         title: "Production Deployment",
         scenario: "Preparing to publish the new season game update to millions of active players.",
         options: [
-          { label: "Run automated test suites and deploy staging server sandbox first", bonus: 45, feedback: "Flawless launch with zero server downtime! Executive $45 bonus awarded!", isQuality: true },
-          { label: "Push code directly to live production servers without running tests", bonus: 0, feedback: "Server crashed for 20 minutes.", isQuality: false }
+          { label: "Push code directly to live production servers without running tests", bonus: 0, feedback: "Server crashed for 20 minutes.", isQuality: false },
+          { label: "Run automated test suites and deploy staging server sandbox first", bonus: 45, feedback: "Flawless launch with zero server downtime! Executive $45 bonus awarded!", isQuality: true }
         ]
       }
     ]
   };
 
   const selectJob = (jobName: string, wage: number) => {
+    const rawTasks = CAREER_TASKS[jobName] || CAREER_TASKS["Baker 🥐"];
+    // Randomize option order dynamically on each shift so answers are never predictably always A or always B
+    const randomizedTasks = rawTasks.map(task => {
+      const shouldSwap = Math.random() > 0.5;
+      return {
+        ...task,
+        options: shouldSwap ? [task.options[1], task.options[0]] : [...task.options]
+      };
+    });
+
     setGameState({
       selectedJob: { name: jobName, wage },
+      tasks: randomizedTasks,
       taskIndex: 0,
       totalBonus: 0,
       taskFeedback: null,
@@ -362,7 +373,7 @@ export default function ModuleInteractive({ module, onComplete, userCoins }: Mod
   const handleNextTask = () => {
     setGameState((prev: any) => {
       const jobKey = prev.selectedJob?.name || "Baker 🥐";
-      const tasks = CAREER_TASKS[jobKey] || CAREER_TASKS["Baker 🥐"];
+      const tasks = prev.tasks || CAREER_TASKS[jobKey] || CAREER_TASKS["Baker 🥐"];
       const nextIdx = prev.taskIndex + 1;
 
       if (nextIdx >= tasks.length) {
@@ -470,8 +481,8 @@ export default function ModuleInteractive({ module, onComplete, userCoins }: Mod
         title: "Unexpected Event: Bicycle Repair Bill!",
         description: "Your bike tire popped and chain broke on the way to work/school!",
         options: [
-          { label: "Fix flat tire & replace chain at local repair shop (-$65)", amount: -65, feedback: "Essential transportation need paid! Your savings emergency buffer handled it seamlessly." },
-          { label: "Buy a brand-new expensive sports bike (-$280)", amount: -280, feedback: "The new bike looks cool, but severely drained your savings!" }
+          { label: "Buy a brand-new expensive sports bike (-$280)", amount: -280, feedback: "The new bike looks cool, but severely drained your savings!" },
+          { label: "Fix flat tire & replace chain at local repair shop (-$65)", amount: -65, feedback: "Essential transportation need paid! Your savings emergency buffer handled it seamlessly." }
         ]
       },
       variableNeedOptions: {
@@ -513,8 +524,8 @@ export default function ModuleInteractive({ module, onComplete, userCoins }: Mod
         title: "Spring Wardrobe Replacement",
         description: "You've outgrown your old sneakers and work shoes.",
         options: [
-          { label: "Thrift store quality shoes & essentials", cost: 45, feedback: "Found durable, stylish shoes at a bargain!", tag: "smart" },
-          { label: "Designer sneakers at the mall", cost: 140, feedback: "Cool designer look, but expensive!", tag: "splurge" }
+          { label: "Designer sneakers at the mall", cost: 140, feedback: "Cool designer look, but expensive!", tag: "splurge" },
+          { label: "Thrift store quality shoes & essentials", cost: 45, feedback: "Found durable, stylish shoes at a bargain!", tag: "smart" }
         ]
       },
       wantOptions: {
@@ -548,8 +559,8 @@ export default function ModuleInteractive({ module, onComplete, userCoins }: Mod
         title: "Best Friend's Birthday Gift",
         description: "Your best friend's birthday is coming up this weekend.",
         options: [
-          { label: "Craft custom photo scrapbook & framed picture", cost: 20, feedback: "Heartfelt custom gift that your friend loved!", tag: "frugal" },
-          { label: "Buy expensive store gift card & huge plush toy", cost: 60, feedback: "Generous gift, but higher cost!", tag: "fun" }
+          { label: "Buy expensive store gift card & huge plush toy", cost: 60, feedback: "Generous gift, but higher cost!", tag: "fun" },
+          { label: "Craft custom photo scrapbook & framed picture", cost: 20, feedback: "Heartfelt custom gift that your friend loved!", tag: "frugal" }
         ]
       }
     },
@@ -567,8 +578,8 @@ export default function ModuleInteractive({ module, onComplete, userCoins }: Mod
         title: "Summer Meal Planning",
         description: "June weather is warm! Planning your groceries.",
         options: [
-          { label: "Local farmers market produce & home prep", cost: 150, feedback: "Fresh, healthy & budget-friendly!", tag: "smart" },
-          { label: "Pre-made summer deli platters & pre-cut fruit", cost: 220, feedback: "Convenient, but deli prices are high.", tag: "splurge" }
+          { label: "Pre-made summer deli platters & pre-cut fruit", cost: 220, feedback: "Convenient, but deli prices are high.", tag: "splurge" },
+          { label: "Local farmers market produce & home prep", cost: 150, feedback: "Fresh, healthy & budget-friendly!", tag: "smart" }
         ]
       },
       wantOptions: {
@@ -1372,7 +1383,7 @@ export default function ModuleInteractive({ module, onComplete, userCoins }: Mod
 
             {gameState.stage === "work" && (() => {
               const jobKey = gameState.selectedJob?.name || "Baker 🥐";
-              const tasks = CAREER_TASKS[jobKey] || CAREER_TASKS["Baker 🥐"];
+              const tasks = gameState.tasks || CAREER_TASKS[jobKey] || CAREER_TASKS["Baker 🥐"];
               const currentTask = tasks[gameState.taskIndex] || tasks[0];
               const baseEarnings = gameState.selectedJob?.wage * 8;
               const currentEarnings = baseEarnings + (gameState.totalBonus || 0);

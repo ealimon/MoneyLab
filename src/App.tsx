@@ -11,7 +11,6 @@ import { ADVENTURE_MODULES, AdventureModuleConfig } from "./modulesConfig";
 import { UserProgress } from "./types";
 import ModuleInteractive from "./components/modules/ModuleInteractive";
 import ModuleQuiz from "./components/ModuleQuiz";
-import FinnyChat from "./components/FinnyChat";
 import ModuleWorksheet from "./components/ModuleWorksheet";
 import StreakModal from "./components/StreakModal";
 import JuniorSaverCertificateModal from "./components/JuniorSaverCertificateModal";
@@ -720,11 +719,6 @@ export default function App() {
           progress={progress}
           onUpdateProgress={handleUpdateProgress}
         />
-      </div>
-
-      {/* FLOATING CHAT COMPONENT */}
-      <div className="print:hidden">
-        <FinnyChat />
       </div>
 
       {/* FOOTER */}
