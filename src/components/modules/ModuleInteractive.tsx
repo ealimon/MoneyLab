@@ -10,9 +10,10 @@ interface ModuleInteractiveProps {
   module: Module;
   onComplete: (awardedCoins: number, awardedXp: number) => void;
   userCoins: number;
+  onSpendCoins: (amount: number) => void;
 }
 
-export default function ModuleInteractive({ module, onComplete, userCoins }: ModuleInteractiveProps) {
+export default function ModuleInteractive({ module, onComplete, userCoins, onSpendCoins }: ModuleInteractiveProps) {
   const [gameState, setGameState] = useState<any>({});
   const [isCompleted, setIsCompleted] = useState(false);
 
@@ -973,6 +974,7 @@ export default function ModuleInteractive({ module, onComplete, userCoins }: Mod
       alert("Hoot! You don't have enough earned Fin-Coins for this donation yet. Keep completing modules to earn more coins!");
       return;
     }
+    onSpendCoins(amount);
     setGameState((prev: any) => {
       const itemKey = `${charity}Donated` as const;
       return {

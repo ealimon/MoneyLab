@@ -1,13 +1,18 @@
 import express from "express";
 import path from "path";
-import { createServer as createViteServer } from "vite";
 import dotenv from "dotenv";
 
 dotenv.config();
 
+// The production bundle (dist/server.cjs) must never boot the Vite dev server,
+// even when the host doesn't set NODE_ENV.
+const isProduction =
+  process.env.NODE_ENV === "production" ||
+  path.basename(process.argv[1] ?? "") === "server.cjs";
+
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = Number(process.env.PORT) || 3000;
 
   app.use(express.json());
 
@@ -17,7 +22,9 @@ async function startServer() {
   });
 
   // Serve static assets in production, else let Vite handle it in dev
-  if (process.env.NODE_ENV !== "production") {
+  if (!isProduction) {
+    // Imported lazily so the production bundle doesn't need vite at runtime.
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
@@ -38,4 +45,5 @@ async function startServer() {
 
 startServer().catch((err) => {
   console.error("Server startup crashed:", err);
+  process.exit(1);
 });
