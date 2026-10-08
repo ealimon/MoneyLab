@@ -971,7 +971,7 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
   // ----------------------------------------------------
   const donateCoins = (charity: "shelter" | "foodBank" | "forest", amount: number) => {
     if (userCoins < amount) {
-      alert("Hoot! You don't have enough earned Fin-Coins for this donation yet. Keep completing modules to earn more coins!");
+      alert("Hoot! You don't have enough earned Stars for this donation yet. Keep completing modules to earn more coins!");
       return;
     }
     onSpendCoins(amount);

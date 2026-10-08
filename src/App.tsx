@@ -26,7 +26,8 @@ import {
   toggleAudioMuted 
 } from "./utils/audio";
 
-const STORAGE_KEY = "finance_quest_academy_progress";
+const STORAGE_KEY = "moneylab_progress";
+const LEGACY_STORAGE_KEY = "finance_quest_academy_progress"; // pre-rename saves
 
 const DEFAULT_PROGRESS: UserProgress = {
   xp: 0,
@@ -77,7 +78,7 @@ export default function App() {
 
   // Load progress from LocalStorage on mount & evaluate streak
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const saved = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_STORAGE_KEY);
     let loadedProgress = DEFAULT_PROGRESS;
 
     if (saved) {
@@ -221,7 +222,7 @@ export default function App() {
   // Filter modules according to selected grade pill
   const filteredAdventures = ADVENTURE_MODULES.filter(adv => {
     if (gradeFilter === "all") return true;
-    return adv.gradeFilter === gradeFilter;
+    return adv.gradeFilters.includes(gradeFilter);
   });
 
   return (
@@ -794,7 +795,7 @@ export default function App() {
       {/* FOOTER */}
       <footer className="bg-white border-t-4 border-black py-6 mt-12 shadow-inner print:hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-600 font-black font-display gap-3">
-          <p>© 2026 STORYBOOK FINANCE. Designed for future financial champions.</p>
+          <p>© {new Date().getFullYear()} MONEYLAB. Designed for future financial champions.</p>
           <div className="flex gap-4">
             <span className="flex items-center gap-1"><Sparkle className="w-3.5 h-3.5 text-yellow-500" /> 10 ADVENTURES</span>
             <span className="flex items-center gap-1"><Sparkle className="w-3.5 h-3.5 text-indigo-500" /> PRINTABLE WORKSHEETS</span>

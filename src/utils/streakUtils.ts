@@ -89,24 +89,25 @@ export function evaluateUserStreakOnLoad(progress: UserProgress): {
     return { updatedProgress: progress };
   }
 
-  // User missed 2 or more days!
+  // User missed one or more full days (daysDiff 2 = yesterday was missed)
   const currentStreak = progress.streakCount ?? 0;
   const freezes = progress.streakFreezes ?? 0;
+  const missedDays = daysDiff - 1;
 
-  if (currentStreak > 0 && freezes > 0) {
-    // Consume 1 streak freeze to protect the streak!
+  if (currentStreak > 0 && freezes >= missedDays) {
+    // Each missed day consumes one streak freeze
     const yesterday = getYesterdayFormatted();
     const updatedProgress: UserProgress = {
       ...progress,
-      streakFreezes: freezes - 1,
+      streakFreezes: freezes - missedDays,
       lastActiveDate: yesterday // Protects streak so today continues it
     };
     return {
       updatedProgress,
-      notificationMessage: "❄️ Streak Freeze Activated! You missed a day, but your streak freeze protected your hard-earned streak!"
+      notificationMessage: `❄️ Streak Freeze Activated! You missed ${missedDays} day${missedDays === 1 ? "" : "s"}, and ${missedDays} streak freeze${missedDays === 1 ? "" : "s"} protected your hard-earned streak!`
     };
   } else if (currentStreak > 0) {
-    // No freeze available -> Streak resets
+    // Not enough freezes to cover every missed day -> Streak resets (freezes are kept)
     const updatedProgress: UserProgress = {
       ...progress,
       streakCount: 0,
@@ -114,7 +115,7 @@ export function evaluateUserStreakOnLoad(progress: UserProgress): {
     };
     return {
       updatedProgress,
-      notificationMessage: "😢 Oh no! You missed a day without a Streak Freeze, so your streak reset to 0. Finish a lesson today to start a fresh fire!"
+      notificationMessage: `😢 Oh no! You missed ${missedDays} day${missedDays === 1 ? "" : "s"} and didn't have enough Streak Freezes, so your streak reset to 0. Finish a lesson today to start a fresh fire!`
     };
   }
 
