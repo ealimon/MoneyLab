@@ -9,6 +9,8 @@ interface ModuleQuizProps {
   onComplete: () => void;
 }
 
+const PASS_SCORE = 4; // correct answers needed (out of 5)
+
 // Utility: Fisher-Yates array shuffle
 function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];
@@ -64,6 +66,7 @@ export default function ModuleQuiz({ module, onComplete }: ModuleQuizProps) {
     setScore(0);
   };
 
+  const passed = score >= Math.min(PASS_SCORE, sessionQuestions.length);
   const currentQuestion: QuizQuestion | undefined = sessionQuestions[currentQuestionIdx];
 
   const handleSelectOption = (idx: number) => {
@@ -219,13 +222,15 @@ export default function ModuleQuiz({ module, onComplete }: ModuleQuizProps) {
           </div>
 
           <div className="space-y-2">
-            <h3 className="text-2xl font-black text-sky-950 tracking-tight font-display">Lesson Mastered!</h3>
+            <h3 className="text-2xl font-black text-sky-950 tracking-tight font-display">{passed ? "Lesson Mastered!" : "Almost There!"}</h3>
             <p className="text-sm text-slate-600 font-semibold">
-              You scored <strong>{score} out of {sessionQuestions.length}</strong>! {score >= 4 ? "Outstanding work!" : "Great practice effort!"}
+              You scored <strong>{score} out of {sessionQuestions.length}</strong>!{" "}
+              {passed ? "Outstanding work!" : `You need ${Math.min(PASS_SCORE, sessionQuestions.length)} correct to master this lesson. Try 5 new questions!`}
             </p>
           </div>
 
           {/* Badge Display */}
+          {passed && (
           <div className="bg-sky-50 border-2 border-sky-100 rounded-3xl p-5 max-w-sm mx-auto flex items-center gap-4 text-left shadow-[0_6px_0_0_#e0f2fe]">
             <div className={`p-4 rounded-xl border-2 ${module.badge.color} shadow-sm text-3xl`}>
               🏅
@@ -238,8 +243,10 @@ export default function ModuleQuiz({ module, onComplete }: ModuleQuizProps) {
               <p className="text-sm text-slate-500 mt-1 font-semibold">{module.badge.description}</p>
             </div>
           </div>
+          )}
 
           <div className="space-y-3 pt-2 max-w-sm mx-auto">
+            {passed && (
             <button
               id="collect-rewards-btn"
               onClick={onComplete}
@@ -247,13 +254,14 @@ export default function ModuleQuiz({ module, onComplete }: ModuleQuizProps) {
             >
               Collect Lesson Rewards <Award className="w-5 h-5" />
             </button>
+            )}
 
             <button
               id="retake-quiz-btn"
               onClick={initNewQuiz}
               className="w-full bg-sky-50 hover:bg-sky-100 text-sky-800 border-2 border-sky-200 font-black py-3 rounded-2xl transition-all text-xs flex items-center justify-center gap-2 font-display uppercase tracking-wider cursor-pointer"
             >
-              <RefreshCw className="w-3.5 h-3.5" /> Practice With 5 New Random Questions
+              <RefreshCw className="w-3.5 h-3.5" /> {passed ? "Practice With 5 New Random Questions" : "Try 5 New Questions"}
             </button>
           </div>
         </div>

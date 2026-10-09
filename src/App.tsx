@@ -54,6 +54,7 @@ export default function App() {
   const [isStreakModalOpen, setIsStreakModalOpen] = useState(false);
   const [isCertificateModalOpen, setIsCertificateModalOpen] = useState(false);
   const [isMuted, setIsMuted] = useState<boolean>(() => isAudioMuted());
+  const [lastQuizWasRepeat, setLastQuizWasRepeat] = useState(false);
 
   // Attach global tactile click feedback for tactile wooden pop sound
   useEffect(() => {
@@ -106,6 +107,12 @@ export default function App() {
   const handleUpdateProgress = (updates: Partial<UserProgress>) => {
     const updated = { ...progress, ...updates };
     saveProgress(updated);
+  };
+
+  // Spending is deducted from the real balance (used by Module 10 donations)
+  const handleSpendCoins = (amount: number) => {
+    if (amount <= 0 || progress.coins < amount) return;
+    saveProgress({ ...progress, coins: progress.coins - amount });
   };
 
   const handleResetProgress = () => {
@@ -181,9 +188,14 @@ export default function App() {
     // Record today's activity in streak engine
     const { updatedProgress: streakProgress, milestoneCoinsBonus } = recordActivityForToday(progress);
 
+    // Module XP/Star rewards are paid once; replays only count toward the daily streak
+    const moduleXp = isAlreadyCompleted ? 0 : activeModule.xpReward;
+    const moduleCoins = isAlreadyCompleted ? 0 : activeModule.coinReward;
+    setLastQuizWasRepeat(isAlreadyCompleted);
+
     // Accumulate rewards
-    let newXp = streakProgress.xp + activeModule.xpReward;
-    let newCoins = streakProgress.coins + activeModule.coinReward + milestoneCoinsBonus;
+    let newXp = streakProgress.xp + moduleXp;
+    let newCoins = streakProgress.coins + moduleCoins + milestoneCoinsBonus;
     let newLevel = streakProgress.level;
 
     while (newXp >= getXpThreshold(newLevel)) {
@@ -203,6 +215,8 @@ export default function App() {
     playSuccessChime();
     setModuleStage("complete");
   };
+
+  const allModulesMastered = progress.completedModules.length >= ADVENTURE_MODULES.length;
 
   // Filter modules according to selected grade pill
   const filteredAdventures = ADVENTURE_MODULES.filter(adv => {
@@ -281,10 +295,10 @@ export default function App() {
                 setIsCertificateModalOpen(true);
               }}
               className="bg-[#fcd34d] hover:bg-[#fbbf24] border-2 border-black text-black px-3.5 py-1.5 rounded-2xl font-black text-xs sm:text-sm shadow-[2px_2px_0px_0px_#000] flex items-center gap-1.5 font-display transition-all active:translate-y-0.5 cursor-pointer"
-              title="View your official Middle School Financial Literacy Diploma"
+              title={allModulesMastered ? "View your official Middle School Financial Literacy Diploma" : `Master all ${ADVENTURE_MODULES.length} modules to unlock your diploma`}
             >
-              <Award className="w-4 h-4 text-black" />
-              <span>DIPLOMA UNLOCKED</span>
+              {allModulesMastered ? <Award className="w-4 h-4 text-black" /> : <Lock className="w-4 h-4 text-black" />}
+              <span>{allModulesMastered ? "DIPLOMA UNLOCKED" : `DIPLOMA ${progress.completedModules.length}/${ADVENTURE_MODULES.length}`}</span>
             </button>
 
             {/* Streak Counter */}
@@ -627,6 +641,7 @@ export default function App() {
                     <ModuleInteractive
                       module={activeModule}
                       userCoins={progress.coins}
+                      onSpendCoins={handleSpendCoins}
                       onComplete={() => handleModuleStageTransition("quiz")}
                     />
                   )}
@@ -652,7 +667,9 @@ export default function App() {
                       </div>
 
                       <div className="bg-emerald-100 border-2 border-black rounded-2xl py-3 px-5 text-sm font-black text-emerald-950 inline-block font-display shadow-[2px_2px_0px_0px_#000]">
-                        +{activeModule.coinReward} Stars • +{activeModule.xpReward} XP Awarded!
+                        {lastQuizWasRepeat
+                          ? "Replay complete! Stars and XP are only awarded the first time."
+                          : `+${activeModule.coinReward} Stars • +${activeModule.xpReward} XP Awarded!`}
                       </div>
 
                       <div className="flex flex-col gap-3 pt-2">
@@ -761,6 +778,7 @@ export default function App() {
         isOpen={isCertificateModalOpen}
         onClose={() => setIsCertificateModalOpen(false)}
         progress={progress}
+        totalModules={ADVENTURE_MODULES.length}
       />
 
       {/* STREAK CALENDAR MODAL */}

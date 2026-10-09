@@ -6,14 +6,35 @@ interface JuniorSaverCertificateModalProps {
   isOpen: boolean;
   onClose: () => void;
   progress: UserProgress;
+  totalModules: number;
+}
+
+const NAME_KEY = "moneylab_student_name";
+const DEFAULT_NAME = "Junior Financial Champion";
+
+function loadName(): string {
+  try {
+    return localStorage.getItem(NAME_KEY) || DEFAULT_NAME;
+  } catch {
+    return DEFAULT_NAME;
+  }
 }
 
 export default function JuniorSaverCertificateModal({
   isOpen,
   onClose,
-  progress
+  progress,
+  totalModules
 }: JuniorSaverCertificateModalProps) {
-  const [studentName, setStudentName] = useState("Junior Financial Champion");
+  const [studentName, setStudentName] = useState(loadName);
+  const handleNameChange = (name: string) => {
+    setStudentName(name);
+    try {
+      localStorage.setItem(NAME_KEY, name);
+    } catch {
+      // storage unavailable; name just won't persist
+    }
+  };
   const todayDate = new Date().toLocaleDateString("en-US", {
     month: "long",
     day: "numeric",
@@ -21,6 +42,28 @@ export default function JuniorSaverCertificateModal({
   });
 
   if (!isOpen) return null;
+
+  const completed = progress.completedModules.length;
+  if (completed < totalModules) {
+    return (
+      <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 print:hidden">
+        <div className="bg-white rounded-3xl border-4 border-black shadow-[8px_8px_0px_0px_#000] w-full max-w-md p-8 text-center space-y-4">
+          <div className="text-6xl">🔒</div>
+          <h2 className="text-2xl font-black font-display text-slate-900">Diploma Locked</h2>
+          <p className="text-sm font-bold text-slate-600">
+            Master all {totalModules} modules to earn your Certificate of Mastery. You've mastered{" "}
+            <strong>{completed} of {totalModules}</strong> so far — keep going!
+          </p>
+          <button
+            onClick={onClose}
+            className="bg-yellow-300 hover:bg-yellow-400 text-black font-black text-sm px-5 py-2 rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_#000]"
+          >
+            Back to Lab
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto print:p-0 print:bg-white">
@@ -77,7 +120,7 @@ export default function JuniorSaverCertificateModal({
               <input
                 type="text"
                 value={studentName}
-                onChange={(e) => setStudentName(e.target.value)}
+                onChange={(e) => handleNameChange(e.target.value)}
                 className="w-full text-center text-2xl sm:text-3xl font-black font-display text-slate-900 border-b-2 border-dashed border-amber-400 bg-transparent focus:outline-none focus:border-amber-600 pb-1"
                 placeholder="Student Name"
               />
@@ -100,7 +143,7 @@ export default function JuniorSaverCertificateModal({
               </div>
               <div className="bg-white border-2 border-black rounded-xl p-2 shadow-[2px_2px_0px_0px_#000]">
                 <span className="text-lg">📚</span>
-                <p className="text-xs font-black font-display text-slate-900">{progress.completedModules.length} of 10 Done</p>
+                <p className="text-xs font-black font-display text-slate-900">{completed} of {totalModules} Done</p>
               </div>
               <div className="bg-white border-2 border-black rounded-xl p-2 shadow-[2px_2px_0px_0px_#000]">
                 <span className="text-lg">🏅</span>
@@ -126,7 +169,7 @@ export default function JuniorSaverCertificateModal({
                 </span>
                 <Award className="w-6 h-6 text-amber-950 my-0.5" />
                 <span className="text-[9px] font-black text-amber-950 uppercase tracking-tighter leading-none">
-                  SEAL 2026
+                  SEAL {new Date().getFullYear()}
                 </span>
               </div>
 
