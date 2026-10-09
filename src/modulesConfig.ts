@@ -137,7 +137,7 @@ export const ADVENTURE_MODULES: AdventureModuleConfig[] = [
     categoryBg: "bg-[#e879f9] text-slate-950 border-2 border-black",
     grade: "GRADE 6-8",
     gradeFilters: ["gr6", "gr7", "gr8"],
-    description: "Learn how to use your wealth to make a difference. Donate your accumulated virtual coins to re-build and upgrade your community!",
+    description: "Learn how to use your wealth to make a difference. Donate your accumulated Stars to re-build and upgrade your community!",
     actionLabel: "LET'S GIVE! >",
     actionBg: "bg-[#e879f9] hover:bg-[#d946ef] text-slate-950 border-2 border-black shadow-[2px_2px_0px_0px_#000]",
     icon: "❤️",

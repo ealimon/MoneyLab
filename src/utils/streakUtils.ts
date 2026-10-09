@@ -168,13 +168,13 @@ export function recordActivityForToday(progress: UserProgress): {
   let bonusMsg = "";
   if (newStreakCount === 4) {
     milestoneCoinsBonus = 30;
-    bonusMsg = " 🎉 Earned +30 Coins Milestone Bonus!";
+    bonusMsg = " 🎉 Earned +30 Stars Milestone Bonus!";
   } else if (newStreakCount === 7) {
     milestoneCoinsBonus = 100;
-    bonusMsg = " 🔥 Earned +100 Coins Super Streak Bonus!";
+    bonusMsg = " 🔥 Earned +100 Stars Super Streak Bonus!";
   } else if (newStreakCount === 14) {
     milestoneCoinsBonus = 250;
-    bonusMsg = " 👑 Earned +250 Coins Ultimate Streak Bonus!";
+    bonusMsg = " 👑 Earned +250 Stars Ultimate Streak Bonus!";
   }
 
   const updatedProgress: UserProgress = {
