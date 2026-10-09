@@ -42,7 +42,7 @@ export default function StreakModal({ isOpen, onClose, progress, onUpdateProgres
 
   // Check in for a specific day in current week
   const simulateCheckInForDay = (dateStr: string, dayName: string) => {
-    if (activityDates.includes(dateStr) || streakCalendar.includes(dayName)) {
+    if (activityDates.includes(dateStr)) {
       setSimulationMsg(`✨ Activity already logged for ${dayName} (${dateStr})! Pick another day to practice.`);
       return;
     }
@@ -158,7 +158,7 @@ export default function StreakModal({ isOpen, onClose, progress, onUpdateProgres
 
               <div className="grid grid-cols-7 gap-1.5">
                 {weekDays.map(({ dayName, dateStr, isToday }) => {
-                  const isCompleted = activityDates.includes(dateStr) || streakCalendar.includes(dayName);
+                  const isCompleted = activityDates.includes(dateStr);
                   return (
                     <button
                       key={dateStr}

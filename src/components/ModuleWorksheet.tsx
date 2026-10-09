@@ -799,7 +799,7 @@ export default function ModuleWorksheet({ moduleId, moduleTitle, moduleSubtitle,
           <div className="flex items-center gap-2 bg-yellow-100 border border-yellow-200 px-4 py-2 rounded-2xl animate-bounce">
             <span className="text-lg">🙌</span>
             <span className="font-black text-yellow-800 text-sm font-display">
-              Double High Five! Awarded 10 Fin-Coins!
+              Double High Five! Worksheet submitted!
             </span>
           </div>
         )}
