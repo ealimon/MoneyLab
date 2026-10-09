@@ -117,7 +117,7 @@ export default function App() {
   };
 
   const handleResetProgress = () => {
-    if (window.confirm("Hoot! Are you sure you want to reset your academy learning history, unlocked coins, and accessories? This cannot be undone!")) {
+    if (window.confirm("Hoot! Are you sure you want to reset your academy learning history, earned Stars, and badges? This cannot be undone!")) {
       saveProgress(DEFAULT_PROGRESS);
       setSelectedModuleId("m1");
       setWorkspaceTab("game");
@@ -282,7 +282,7 @@ export default function App() {
               )}
             </button>
 
-            {/* Stars / Coins Balance */}
+            {/* Stars Balance */}
             <div className="bg-[#fde047] border-2 border-black text-black px-3.5 py-1.5 rounded-2xl font-black text-xs sm:text-sm shadow-[2px_2px_0px_0px_#000] flex items-center gap-1.5 font-display">
               <Star className="w-4 h-4 fill-amber-500 text-black" />
               <span>{progress.coins} STARS</span>

@@ -971,7 +971,7 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
   // ----------------------------------------------------
   const donateCoins = (charity: "shelter" | "foodBank" | "forest", amount: number) => {
     if (userCoins < amount) {
-      alert("Hoot! You don't have enough earned Stars for this donation yet. Keep completing modules to earn more coins!");
+      alert("Hoot! You don't have enough earned Stars for this donation yet. Keep completing modules to earn more Stars!");
       return;
     }
     onSpendCoins(amount);
@@ -1004,8 +1004,8 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
           </div>
           <div className="h-6 w-[1px] bg-slate-200" />
           <div className="text-center px-1">
-            <p className="text-xs font-black text-slate-400 uppercase">Coins Reward</p>
-            <p className="font-bold text-base text-yellow-500">+{module.coinReward} Coins</p>
+            <p className="text-xs font-black text-slate-400 uppercase">Stars Reward</p>
+            <p className="font-bold text-base text-yellow-500">+{module.coinReward} Stars</p>
           </div>
         </div>
       </div>
@@ -3200,7 +3200,7 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
         {module.id === "m10" && (
           <div className="space-y-6">
             <div className="bg-pink-50 border border-pink-100 rounded-xl p-4 text-xs font-medium text-pink-800">
-              💖 <strong>The Community Spark:</strong> Give back! Choose a worthy local charity to donate your real accumulated virtual Fin-Coins to. Each donation helps upgrade our local neighborhood assets!
+              💖 <strong>The Community Spark:</strong> Give back! Choose a worthy local charity to donate your real accumulated Stars to. Each donation helps upgrade our local neighborhood assets!
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -3210,7 +3210,7 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
                 <div>
                   <h4 className="font-bold text-slate-800 text-sm">Animal Shelter</h4>
                   <p className="text-xs text-slate-500 font-semibold">Rescues puppies and kitties.</p>
-                  <p className="text-xs font-bold text-pink-600 mt-2">Donated: {gameState.shelterDonated || 0} Coins</p>
+                  <p className="text-xs font-bold text-pink-600 mt-2">Donated: {gameState.shelterDonated || 0} Stars</p>
                 </div>
                 <div className="flex gap-1">
                   <button
@@ -3218,14 +3218,14 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
                     onClick={() => donateCoins("shelter", 20)}
                     className="flex-1 bg-pink-100 hover:bg-pink-200 text-pink-700 text-xs font-black py-1.5 rounded-lg transition-all"
                   >
-                    Give 20 🪙
+                    Give 20 ⭐
                   </button>
                   <button
                     id="donate-shelter-50"
                     onClick={() => donateCoins("shelter", 50)}
                     className="flex-1 bg-pink-500 hover:bg-pink-600 text-white text-xs font-black py-1.5 rounded-lg transition-all"
                   >
-                    Give 50 🪙
+                    Give 50 ⭐
                   </button>
                 </div>
               </div>
@@ -3236,7 +3236,7 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
                 <div>
                   <h4 className="font-bold text-slate-800 text-sm">Community Food Bank</h4>
                   <p className="text-xs text-slate-500 font-semibold">Feeds families in need.</p>
-                  <p className="text-xs font-bold text-pink-600 mt-2">Donated: {gameState.foodBankDonated || 0} Coins</p>
+                  <p className="text-xs font-bold text-pink-600 mt-2">Donated: {gameState.foodBankDonated || 0} Stars</p>
                 </div>
                 <div className="flex gap-1">
                   <button
@@ -3244,14 +3244,14 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
                     onClick={() => donateCoins("foodBank", 20)}
                     className="flex-1 bg-pink-100 hover:bg-pink-200 text-pink-700 text-xs font-black py-1.5 rounded-lg transition-all"
                   >
-                    Give 20 🪙
+                    Give 20 ⭐
                   </button>
                   <button
                     id="donate-food-50"
                     onClick={() => donateCoins("foodBank", 50)}
                     className="flex-1 bg-pink-500 hover:bg-pink-600 text-white text-xs font-black py-1.5 rounded-lg transition-all"
                   >
-                    Give 50 🪙
+                    Give 50 ⭐
                   </button>
                 </div>
               </div>
@@ -3262,7 +3262,7 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
                 <div>
                   <h4 className="font-bold text-slate-800 text-sm">Eco Conservation</h4>
                   <p className="text-xs text-slate-500 font-semibold">Plants trees and saves wildlife.</p>
-                  <p className="text-xs font-bold text-pink-600 mt-2">Donated: {gameState.forestDonated || 0} Coins</p>
+                  <p className="text-xs font-bold text-pink-600 mt-2">Donated: {gameState.forestDonated || 0} Stars</p>
                 </div>
                 <div className="flex gap-1">
                   <button
@@ -3270,14 +3270,14 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
                     onClick={() => donateCoins("forest", 20)}
                     className="flex-1 bg-pink-100 hover:bg-pink-200 text-pink-700 text-xs font-black py-1.5 rounded-lg transition-all"
                   >
-                    Give 20 🪙
+                    Give 20 ⭐
                   </button>
                   <button
                     id="donate-eco-50"
                     onClick={() => donateCoins("forest", 50)}
                     className="flex-1 bg-pink-500 hover:bg-pink-600 text-white text-xs font-black py-1.5 rounded-lg transition-all"
                   >
-                    Give 50 🪙
+                    Give 50 ⭐
                   </button>
                 </div>
               </div>
@@ -3286,7 +3286,7 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
             {gameState.badgeEarned && (
               <div className="space-y-4">
                 <div className="bg-emerald-50 text-emerald-800 p-4 rounded-xl border border-emerald-100 text-xs font-medium text-center">
-                  🌟 <strong>Generosity Unleashed!</strong> You've donated a total of <strong>{gameState.spentCoins} Fin-Coins</strong> to critical civic sectors! You make our community a better place.
+                  🌟 <strong>Generosity Unleashed!</strong> You've donated a total of <strong>{gameState.spentCoins} Stars</strong> to critical civic sectors! You make our community a better place.
                 </div>
                 <button
                   id="m10-complete"

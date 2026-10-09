@@ -968,7 +968,7 @@ export const MODULES: Module[] = [
     id: "m10",
     title: "Giving Back",
     subtitle: "The Power of Philanthropy",
-    description: "Learn how to use your wealth to make a difference. Donate your accumulated virtual coins to rebuild and upgrade your community!",
+    description: "Learn how to use your wealth to make a difference. Donate your accumulated Stars to rebuild and upgrade your community!",
     category: "saving",
     estimatedMinutes: 5,
     xpReward: 120,
