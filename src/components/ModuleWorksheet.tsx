@@ -7,7 +7,32 @@ interface WorksheetQuestion {
   question: string;
   options?: string[];
   correctAnswer: string;
+  /** Text questions only: answers that count as correct. Omitted = open-ended, self-checked. */
+  accept?: string[];
   explanation: string;
+}
+
+type Result = "correct" | "incorrect" | "review";
+
+const normalize = (t: string) => t.toLowerCase().replace(/[$,]/g, "").replace(/\s+/g, " ").trim();
+const numbersIn = (t: string) => (normalize(t).match(/\d+(?:\.\d+)?/g) || []).map(Number);
+
+function matchesPart(part: string, answer: string): boolean {
+  if (part.startsWith("#")) {
+    const want = Number(part.slice(1));
+    return numbersIn(answer).some((n) => Math.abs(n - want) < 0.005);
+  }
+  return normalize(answer).includes(part.toLowerCase());
+}
+
+function isAutoChecked(q: WorksheetQuestion): boolean {
+  return q.type === "choice" || !!q.accept;
+}
+
+function gradeAnswer(q: WorksheetQuestion, answer: string): Result {
+  if (q.type === "choice") return normalize(answer) === normalize(q.correctAnswer) ? "correct" : "incorrect";
+  if (!q.accept) return "review";
+  return q.accept.some((opt) => opt.split("&").every((part) => matchesPart(part, answer))) ? "correct" : "incorrect";
 }
 
 interface ModuleWorksheetProps {
@@ -24,6 +49,7 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       type: "text",
       question: "If you trade a backpack directly for a jacket without using any coins or cash, what is this practice called?",
       correctAnswer: "Bartering",
+      accept: ["barter"],
       explanation: "Trading goods or services directly without using money is called bartering."
     },
     {
@@ -58,6 +84,7 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       type: "text",
       question: "Trade Math: If 1 bushel of wheat is worth 4 chickens in trade, how many chickens would a farmer need to trade for 3 bushels of wheat?",
       correctAnswer: "12 chickens",
+      accept: ["#12"],
       explanation: "Multiply the bushels by the exchange rate: 3 bushels * 4 chickens = 12 chickens."
     },
     {
@@ -79,6 +106,7 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       type: "text",
       question: "If an employee earns an hourly wage of $15 and works 10 hours, what is their Gross Pay?",
       correctAnswer: "$150",
+      accept: ["#150"],
       explanation: "Gross Pay is calculated by multiplying hours worked by the hourly rate: 10 hours * $15/hour = $150."
     },
     {
@@ -113,6 +141,7 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       type: "text",
       question: "Paycheck Math: Maria earns $20/hr and works 15 hours this week. If $45 is deducted for taxes and insurance, what is her Net Pay?",
       correctAnswer: "$255",
+      accept: ["#255"],
       explanation: "Gross Pay = 15 hrs * $20 = $300. Net Pay = $300 - $45 deductions = $255 take-home pay."
     },
     {
@@ -134,6 +163,7 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       type: "text",
       question: "According to the popular 50/30/20 rule, what percentage of your income should go toward Savings?",
       correctAnswer: "20%",
+      accept: ["#20"],
       explanation: "The rule splits income as: 50% for Needs, 30% for Wants, and 20% for Savings."
     },
     {
@@ -153,6 +183,7 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       type: "text",
       question: "If you receive an allowance of $40, how much money should you allocate to your 'Wants' category under the 50/30/20 budget framework?",
       correctAnswer: "$12",
+      accept: ["#12"],
       explanation: "Wants get 30% of your budget: 30% of $40 is 0.30 * 40 = $12."
     },
     {
@@ -167,6 +198,7 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       type: "text",
       question: "Budget Math: If your monthly net pay is $500, calculate the exact dollar target for your Needs (50%) and Savings (20%).",
       correctAnswer: "Needs: $250, Savings: $100",
+      accept: ["#250&#100"],
       explanation: "Needs = 50% of $500 = $250. Savings = 20% of $500 = $100. (Wants would be $150)."
     },
     {
@@ -188,6 +220,7 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       type: "text",
       question: "If you deposit $100 in a bank account that pays a 10% annual compound interest rate, how much total money will you have at the end of Year 1?",
       correctAnswer: "$110",
+      accept: ["#110"],
       explanation: "You earn 10% on $100, which is $10 interest, making the total $110."
     },
     {
@@ -222,6 +255,7 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       type: "text",
       question: "Interest Math: If you put $200 in a high-yield savings account earning 5% annual interest, how much interest do you earn in Year 1?",
       correctAnswer: "$10 interest",
+      accept: ["#10"],
       explanation: "$200 * 0.05 = $10.00 in interest earned, giving a new total balance of $210."
     },
     {
@@ -243,6 +277,7 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       type: "text",
       question: "If a 12-ounce bottle of fruit juice costs $3.60, what is its Unit Price per single ounce?",
       correctAnswer: "$0.30 / oz",
+      accept: ["#0.3", "30 cents"],
       explanation: "Divide the total price by the number of ounces: $3.60 / 12oz = $0.30 per ounce."
     },
     {
@@ -281,6 +316,7 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       type: "text",
       question: "Unit Price Math: Cereal Brand X is 20oz for $5.00 ($0.25/oz). Brand Y is 10oz for $3.50 ($0.35/oz). How much do you save per ounce buying Brand X?",
       correctAnswer: "$0.10 per ounce",
+      accept: ["#0.1", "10 cents"],
       explanation: "Brand Y ($0.35) - Brand X ($0.25) = $0.10 saved per ounce on the larger box."
     },
     {
@@ -302,6 +338,7 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       type: "text",
       question: "Where on a physical paper check do you write the name of the person or company you are paying?",
       correctAnswer: "On the 'Pay to the Order of' line.",
+      accept: ["order of", "pay to"],
       explanation: "This specifies exactly who has authorization to deposit or cash the check."
     },
     {
@@ -336,6 +373,7 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       type: "text",
       question: "Ledger Math: Your checking account balance is $80. You spend $25 on shoes with your debit card, then deposit a $45 gift check. What is your new balance?",
       correctAnswer: "$100",
+      accept: ["#100"],
       explanation: "Starting $80 - $25 expense + $45 deposit = $100.00 ending balance."
     },
     {
@@ -391,6 +429,7 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       type: "text",
       question: "Credit Card Math: If you charge a $60 dinner on your credit card and pay the full $60 statement before the monthly due date, how much interest is charged?",
       correctAnswer: "$0.00 (Zero interest)",
+      accept: ["#0", "zero", "no interest", "none"],
       explanation: "If you pay off your full statement balance on time each month, the grace period prevents any interest charges!"
     },
     {
@@ -450,6 +489,7 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       type: "text",
       question: "Stock Profit Math: You buy 5 shares of a robotics company at $20/share ($100 total). You sell them later at $26/share. What is your total profit?",
       correctAnswer: "$30 profit",
+      accept: ["#30"],
       explanation: "Sale total = 5 * $26 = $130. Profit = $130 - $100 = $30 (or $6 gain per share * 5 shares = $30)."
     },
     {
@@ -471,6 +511,7 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       type: "text",
       question: "What does 'FICA' stand for on a standard paycheck stub, and what two public programs does it fund?",
       correctAnswer: "Federal Insurance Contributions Act; funds Social Security and Medicare.",
+      accept: ["social security&medicare"],
       explanation: "FICA is a payroll tax that funds Social Security (retirement) and Medicare (healthcare for seniors)."
     },
     {
@@ -490,6 +531,7 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       type: "text",
       question: "If your Gross Pay is $400, and your paycheck stub lists $40 for Federal Income Tax, $15 for State Tax, and $10 for FICA, what is your final Net Pay?",
       correctAnswer: "$335",
+      accept: ["#335"],
       explanation: "Net Pay = Gross Pay - Deductions. Net = $400 - ($40 + $15 + $10) = $400 - $65 = $335."
     },
     {
@@ -505,6 +547,7 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       type: "text",
       question: "Sales Tax Math: You purchase a $30 backpack in a city with a 6% sales tax. What is the total cost at checkout?",
       correctAnswer: "$31.80",
+      accept: ["#31.8"],
       explanation: "Tax amount = $30 * 0.06 = $1.80. Total price at register = $30 + $1.80 = $31.80."
     },
     {
@@ -564,6 +607,7 @@ const WORKSHEET_DATA: Record<string, WorksheetQuestion[]> = {
       type: "text",
       question: "Giving Budget Math: You earn $50 from weekend pet-sitting and allocate 10% to a local animal shelter. How much do you donate?",
       correctAnswer: "$5.00",
+      accept: ["#5"],
       explanation: "10% of $50 = 0.10 * $50 = $5.00 donated to the shelter."
     },
     {
@@ -585,35 +629,39 @@ export default function ModuleWorksheet({ moduleId, moduleTitle, moduleSubtitle,
   const questions = WORKSHEET_DATA[moduleId] || [];
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [showAnswerKey, setShowAnswerKey] = useState(false);
-  const [celebrated, setCelebrated] = useState(false);
-  const [checkedAnswers, setCheckedAnswers] = useState<Record<string, boolean>>({});
+  const [results, setResults] = useState<Record<string, Result>>({});
+  const [checked, setChecked] = useState(false);
 
   const handleInputChange = (qId: string, value: string) => {
     setAnswers((prev) => ({ ...prev, [qId]: value }));
+    // an edited answer is no longer the one that was checked
+    setResults((prev) => {
+      if (!(qId in prev)) return prev;
+      const { [qId]: _removed, ...rest } = prev;
+      return rest;
+    });
   };
 
   const handlePrint = () => {
     window.print();
   };
 
+  const hasAnswer = (qId: string) => (answers[qId] || "").trim().length > 0;
+
   const handleCheckAnswers = () => {
-    const results: Record<string, boolean> = {};
+    const next: Record<string, Result> = {};
     questions.forEach((q) => {
-      const userAns = (answers[q.id] || "").trim().toLowerCase();
-      const correctAns = q.correctAnswer.toLowerCase();
-      
-      if (q.type === "choice") {
-        results[q.id] = userAns === correctAns;
-      } else {
-        // Simple keyword match for open response
-        const keywords = correctAns.replace(/[$,%]/g, "").split(/\s+/).filter(w => w.length > 2);
-        const match = keywords.some(kw => userAns.includes(kw)) || userAns.includes(correctAns);
-        results[q.id] = match || userAns.length > 3; // Give credit for trying
-      }
+      if (hasAnswer(q.id)) next[q.id] = gradeAnswer(q, answers[q.id]);
     });
-    setCheckedAnswers(results);
-    setCelebrated(true);
+    setResults(next);
+    setChecked(true);
   };
+
+  const autoChecked = questions.filter(isAutoChecked);
+  const autoCorrect = autoChecked.filter((q) => results[q.id] === "correct").length;
+  const unanswered = questions.filter((q) => !hasAnswer(q.id)).length;
+  const selfCheckCount = questions.filter((q) => !isAutoChecked(q)).length;
+  const perfect = checked && unanswered === 0 && autoCorrect === autoChecked.length;
 
   return (
     <div className="bg-white border-2 border-sky-100 rounded-[2rem] p-6 sm:p-8 shadow-[0_8px_0_0_#e0f2fe] space-y-6 text-left max-w-2xl mx-auto print:border-0 print:shadow-none print:p-0 print:m-0 print:max-w-none print:w-full print:space-y-3">
@@ -681,7 +729,7 @@ export default function ModuleWorksheet({ moduleId, moduleTitle, moduleSubtitle,
       {/* Questions list */}
       <div className="space-y-6 pt-2 print:space-y-3 print:pt-0">
         {questions.map((q, idx) => {
-          const isCorrect = checkedAnswers[q.id];
+          const result = results[q.id];
           const isQuestionThree = idx === 2;
           const isQuestionFour = idx === 3;
           return (
@@ -750,31 +798,30 @@ export default function ModuleWorksheet({ moduleId, moduleTitle, moduleSubtitle,
                 </div>
               )}
 
-              {/* Verified Feedback / Success marker */}
-              {celebrated && answers[q.id] && (
+              {/* Feedback after "Check My Answers" */}
+              {checked && result && (
                 <div className="pl-8 flex items-center gap-1.5 text-xs font-black print:hidden">
-                  {isCorrect ? (
+                  {result === "correct" ? (
                     <span className="text-emerald-600 flex items-center gap-1">
-                      <CheckCircle className="w-3.5 h-3.5" /> Checked! Stellar analysis.
+                      <CheckCircle className="w-3.5 h-3.5" /> Correct!
                     </span>
-                  ) : q.type === "choice" ? (
-                    <span className="text-amber-600">
-                      ⚠️ Give it another look! Let's check the core principle below.
-                    </span>
+                  ) : result === "incorrect" ? (
+                    <span className="text-amber-600">⚠️ Not quite! Check the correct answer below.</span>
                   ) : (
-                    <span className="text-emerald-600 flex items-center gap-1">
-                      <CheckCircle className="w-3.5 h-3.5" /> Checked! Thoughtful response.
-                    </span>
+                    <span className="text-sky-600">📝 Open-ended: compare your answer with the model answer below.</span>
                   )}
                 </div>
               )}
+              {checked && !result && (
+                <div className="pl-8 text-xs font-black text-slate-400 print:hidden">Not answered yet.</div>
+              )}
 
               {/* Answer Key Override */}
-              {(showAnswerKey || (celebrated && !isCorrect && q.type === "choice")) && (
+              {(showAnswerKey || result === "incorrect" || result === "review") && (
                 <div className="pl-8 pr-4 py-2.5 bg-emerald-50 rounded-xl border border-emerald-200 text-sm text-emerald-800 space-y-1 print:bg-slate-50 print:border-slate-800 print:text-black print:p-2 print:rounded-lg print:pl-6">
                   <p className="font-extrabold flex items-center gap-1.5 print:text-[11px]">
                     <Sparkles className="w-3.5 h-3.5 text-emerald-600 shrink-0 print:text-slate-800" />
-                    Correct Answer: <span className="font-black underline">{q.correctAnswer}</span>
+                    {result === "review" && !showAnswerKey ? "Model Answer" : "Correct Answer"}: <span className="font-black underline">{q.correctAnswer}</span>
                   </p>
                   <p className="text-xs text-emerald-700/95 font-medium leading-normal print:text-slate-700 print:text-[10px]">
                     {q.explanation}
@@ -792,15 +839,29 @@ export default function ModuleWorksheet({ moduleId, moduleTitle, moduleSubtitle,
           onClick={handleCheckAnswers}
           className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-black px-6 py-3 rounded-2xl shadow-lg shadow-emerald-200 hover:shadow-xl transition-all active:scale-95 text-sm uppercase tracking-wider font-display"
         >
-          Verify & Submit Worksheet
+          Check My Answers
         </button>
 
-        {celebrated && (
-          <div className="flex items-center gap-2 bg-yellow-100 border border-yellow-200 px-4 py-2 rounded-2xl animate-bounce">
-            <span className="text-lg">🙌</span>
-            <span className="font-black text-yellow-800 text-sm font-display">
-              Double High Five! Worksheet submitted!
+        {checked && (
+          <div
+            className={`flex flex-col gap-0.5 px-4 py-2 rounded-2xl border text-sm font-black font-display ${
+              perfect ? "bg-yellow-100 border-yellow-200 text-yellow-800 animate-bounce" : "bg-sky-50 border-sky-100 text-sky-900"
+            }`}
+          >
+            <span>
+              {perfect ? "🙌 Double High Five! " : ""}
+              {autoCorrect} of {autoChecked.length} auto-checked answers correct
             </span>
+            {selfCheckCount > 0 && (
+              <span className="text-xs font-bold opacity-80">
+                {selfCheckCount} open-ended question{selfCheckCount === 1 ? "" : "s"}: compare with the model answers
+              </span>
+            )}
+            {unanswered > 0 && (
+              <span className="text-xs font-bold opacity-80">
+                {unanswered} question{unanswered === 1 ? "" : "s"} still unanswered
+              </span>
+            )}
           </div>
         )}
       </div>
