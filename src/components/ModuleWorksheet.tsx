@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Printer, CheckCircle, Eye, EyeOff, Sparkles, Award } from "lucide-react";
+import { Printer, CheckCircle, Eye, EyeOff, Sparkles, Award, Lock, ShieldCheck, Check, X } from "lucide-react";
 
 interface WorksheetQuestion {
   id: string;
@@ -13,6 +13,35 @@ interface WorksheetQuestion {
 }
 
 type Result = "correct" | "incorrect" | "review";
+type Mark = "correct" | "incorrect";
+
+// Teacher PIN: stored on this device only, so it keeps students out of Teacher Mode
+// but is not real security (anyone who can edit browser storage can bypass it).
+const PIN_KEY = "moneylab_teacher_pin";
+
+function hashPin(pin: string): string {
+  let h = 5381;
+  const str = `moneylab:${pin}`;
+  for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
+  return String(h >>> 0);
+}
+
+function readStoredPin(): string | null {
+  try {
+    return localStorage.getItem(PIN_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function storePin(pin: string): boolean {
+  try {
+    localStorage.setItem(PIN_KEY, hashPin(pin));
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 const normalize = (t: string) => t.toLowerCase().replace(/[$,]/g, "").replace(/\s+/g, " ").trim();
 const numbersIn = (t: string) => (normalize(t).match(/\d+(?:\.\d+)?/g) || []).map(Number);
@@ -631,10 +660,20 @@ export default function ModuleWorksheet({ moduleId, moduleTitle, moduleSubtitle,
   const [showAnswerKey, setShowAnswerKey] = useState(false);
   const [results, setResults] = useState<Record<string, Result>>({});
   const [checked, setChecked] = useState(false);
+  const [teacherMode, setTeacherMode] = useState(false);
+  const [teacherMarks, setTeacherMarks] = useState<Record<string, Mark>>({});
+  const [pinPanel, setPinPanel] = useState<null | "create" | "enter">(null);
+  const [pinInput, setPinInput] = useState("");
+  const [pinError, setPinError] = useState("");
 
   const handleInputChange = (qId: string, value: string) => {
     setAnswers((prev) => ({ ...prev, [qId]: value }));
-    // an edited answer is no longer the one that was checked
+    // an edited answer is no longer the one that was checked or marked
+    setTeacherMarks((prev) => {
+      if (!(qId in prev)) return prev;
+      const { [qId]: _removed, ...rest } = prev;
+      return rest;
+    });
     setResults((prev) => {
       if (!(qId in prev)) return prev;
       const { [qId]: _removed, ...rest } = prev;
@@ -644,6 +683,41 @@ export default function ModuleWorksheet({ moduleId, moduleTitle, moduleSubtitle,
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleTeacherButton = () => {
+    if (teacherMode) {
+      setTeacherMode(false);
+      setShowAnswerKey(false);
+      return;
+    }
+    setPinInput("");
+    setPinError("");
+    setPinPanel(readStoredPin() ? "enter" : "create");
+  };
+
+  const handlePinSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (pinPanel === "create") {
+      if (!/^\d{4,8}$/.test(pinInput)) {
+        setPinError("Choose a PIN of 4 to 8 digits.");
+        return;
+      }
+      if (!storePin(pinInput)) {
+        setPinError("This browser can't save a PIN (private mode?).");
+        return;
+      }
+    } else if (hashPin(pinInput) !== readStoredPin()) {
+      setPinError("That PIN isn't right.");
+      return;
+    }
+    setPinPanel(null);
+    setPinInput("");
+    setTeacherMode(true);
+  };
+
+  const setMark = (qId: string, mark: Mark) => {
+    setTeacherMarks((prev) => (prev[qId] === mark ? prev : { ...prev, [qId]: mark }));
   };
 
   const hasAnswer = (qId: string) => (answers[qId] || "").trim().length > 0;
@@ -660,8 +734,15 @@ export default function ModuleWorksheet({ moduleId, moduleTitle, moduleSubtitle,
   const autoChecked = questions.filter(isAutoChecked);
   const autoCorrect = autoChecked.filter((q) => results[q.id] === "correct").length;
   const unanswered = questions.filter((q) => !hasAnswer(q.id)).length;
-  const selfCheckCount = questions.filter((q) => !isAutoChecked(q)).length;
-  const perfect = checked && unanswered === 0 && autoCorrect === autoChecked.length;
+  const openQs = questions.filter((q) => !isAutoChecked(q));
+  const openMarked = openQs.filter((q) => teacherMarks[q.id]).length;
+  const openCorrect = openQs.filter((q) => teacherMarks[q.id] === "correct").length;
+  const awaiting = openQs.filter((q) => hasAnswer(q.id) && !teacherMarks[q.id]).length;
+  const autoPending = autoChecked.filter((q) => hasAnswer(q.id) && !results[q.id]).length;
+  const totalCorrect = autoCorrect + openCorrect;
+  const finalized = checked && unanswered === 0 && awaiting === 0 && autoPending === 0;
+  const percent = questions.length ? Math.round((totalCorrect / questions.length) * 100) : 0;
+  const perfect = finalized && totalCorrect === questions.length;
 
   return (
     <div className="bg-white border-2 border-sky-100 rounded-[2rem] p-6 sm:p-8 shadow-[0_8px_0_0_#e0f2fe] space-y-6 text-left max-w-2xl mx-auto print:border-0 print:shadow-none print:p-0 print:m-0 print:max-w-none print:w-full print:space-y-3">
@@ -684,12 +765,25 @@ export default function ModuleWorksheet({ moduleId, moduleTitle, moduleSubtitle,
         </div>
         <div className="flex items-center gap-2 print:hidden shrink-0">
           <button
-            onClick={() => setShowAnswerKey(!showAnswerKey)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 border-slate-200 text-slate-600 hover:bg-slate-50 font-black text-sm transition-colors"
+            onClick={handleTeacherButton}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 font-black text-sm transition-colors ${
+              teacherMode
+                ? "border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100"
+                : "border-slate-200 text-slate-600 hover:bg-slate-50"
+            }`}
           >
-            {showAnswerKey ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-            {showAnswerKey ? "Hide Answers" : "Answer Key"}
+            {teacherMode ? <ShieldCheck className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
+            {teacherMode ? "Exit Teacher Mode" : "Teacher Mode"}
           </button>
+          {teacherMode && (
+            <button
+              onClick={() => setShowAnswerKey(!showAnswerKey)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 border-slate-200 text-slate-600 hover:bg-slate-50 font-black text-sm transition-colors"
+            >
+              {showAnswerKey ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+              {showAnswerKey ? "Hide Answers" : "Answer Key"}
+            </button>
+          )}
           <button
             onClick={handlePrint}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-black text-sm shadow-md transition-all active:scale-95"
@@ -699,6 +793,52 @@ export default function ModuleWorksheet({ moduleId, moduleTitle, moduleSubtitle,
           </button>
         </div>
       </div>
+
+      {pinPanel && (
+        <form
+          onSubmit={handlePinSubmit}
+          className="bg-slate-50 border-2 border-slate-200 rounded-2xl p-4 space-y-2 print:hidden"
+        >
+          <p className="text-sm font-black text-slate-800 font-display">
+            {pinPanel === "create" ? "Create a Teacher PIN" : "Enter Teacher PIN"}
+          </p>
+          <p className="text-xs font-semibold text-slate-500">
+            {pinPanel === "create"
+              ? "Choose 4–8 digits. You'll use it to mark open-ended answers and see the answer key. It's saved on this device only; if it's forgotten, clearing this site's browser data resets it (and student progress)."
+              : "Teacher Mode lets you mark open-ended answers and view the answer key."}
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              type="password"
+              inputMode="numeric"
+              autoComplete="off"
+              autoFocus
+              value={pinInput}
+              onChange={(e) => {
+                setPinInput(e.target.value);
+                setPinError("");
+              }}
+              maxLength={8}
+              placeholder="PIN"
+              className="w-28 bg-white border-2 border-slate-200 rounded-xl px-3 py-1.5 text-sm font-bold tracking-widest focus:outline-sky-400"
+            />
+            <button
+              type="submit"
+              className="px-4 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-sm"
+            >
+              {pinPanel === "create" ? "Save PIN" : "Unlock"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setPinPanel(null)}
+              className="px-3 py-1.5 rounded-xl border-2 border-slate-200 text-slate-600 hover:bg-white font-black text-sm"
+            >
+              Cancel
+            </button>
+          </div>
+          {pinError && <p className="text-xs font-black text-rose-600">{pinError}</p>}
+        </form>
+      )}
 
       {/* Classroom header inputs for printing */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-sky-50/50 p-4 rounded-2xl border border-sky-100/50 print:grid-cols-3 print:bg-transparent print:border-0 print:p-0 print:mb-2.5 print:gap-4">
@@ -721,7 +861,7 @@ export default function ModuleWorksheet({ moduleId, moduleTitle, moduleSubtitle,
         <div className="space-y-1 print:space-y-0.5">
           <label className="text-xs sm:text-sm font-black uppercase text-sky-600 font-display print:text-slate-900 print:text-[10px] block">Score / Grade:</label>
           <div className="w-full bg-white border border-sky-100 rounded-xl px-3.5 py-2 text-sm sm:text-base font-bold text-sky-950 print:border-0 print:border-b-2 print:border-slate-800 print:rounded-none print:p-0 print:text-slate-900 print:h-6 print:text-xs">
-            _____ / 100
+            {finalized ? `${percent} / 100` : "_____ / 100"}
           </div>
         </div>
       </div>
@@ -730,6 +870,8 @@ export default function ModuleWorksheet({ moduleId, moduleTitle, moduleSubtitle,
       <div className="space-y-6 pt-2 print:space-y-3 print:pt-0">
         {questions.map((q, idx) => {
           const result = results[q.id];
+          const isOpen = !isAutoChecked(q);
+          const mark = teacherMarks[q.id];
           const isQuestionThree = idx === 2;
           const isQuestionFour = idx === 3;
           return (
@@ -798,30 +940,71 @@ export default function ModuleWorksheet({ moduleId, moduleTitle, moduleSubtitle,
                 </div>
               )}
 
-              {/* Feedback after "Check My Answers" */}
-              {checked && result && (
+              {/* Feedback after "Check My Answers" (auto-checked questions) */}
+              {checked && !isOpen && result && (
                 <div className="pl-8 flex items-center gap-1.5 text-xs font-black print:hidden">
                   {result === "correct" ? (
                     <span className="text-emerald-600 flex items-center gap-1">
                       <CheckCircle className="w-3.5 h-3.5" /> Correct!
                     </span>
-                  ) : result === "incorrect" ? (
-                    <span className="text-amber-600">⚠️ Not quite! Check the correct answer below.</span>
                   ) : (
-                    <span className="text-sky-600">📝 Open-ended: compare your answer with the model answer below.</span>
+                    <span className="text-amber-600">⚠️ Not quite! Check the correct answer below.</span>
                   )}
                 </div>
               )}
-              {checked && !result && (
+              {checked && !hasAnswer(q.id) && (
                 <div className="pl-8 text-xs font-black text-slate-400 print:hidden">Not answered yet.</div>
               )}
 
+              {/* Open-ended questions: marked by the teacher */}
+              {isOpen && hasAnswer(q.id) && mark && (
+                <div className="pl-8 flex items-center gap-1.5 text-xs font-black">
+                  {mark === "correct" ? (
+                    <span className="text-emerald-600 flex items-center gap-1">
+                      <CheckCircle className="w-3.5 h-3.5" /> Teacher marked: Correct!
+                    </span>
+                  ) : (
+                    <span className="text-amber-600">⚠️ Teacher marked: Needs work. Check the model answer below.</span>
+                  )}
+                </div>
+              )}
+              {isOpen && hasAnswer(q.id) && !mark && checked && !teacherMode && (
+                <div className="pl-8 text-xs font-black text-sky-600 print:hidden">
+                  📝 Open-ended: waiting for your teacher to mark this one.
+                </div>
+              )}
+              {teacherMode && isOpen && hasAnswer(q.id) && (
+                <div className="pl-8 flex flex-wrap items-center gap-2 print:hidden">
+                  <span className="text-xs font-black text-slate-500 uppercase tracking-wide">Teacher marking:</span>
+                  <button
+                    onClick={() => setMark(q.id, "correct")}
+                    className={`flex items-center gap-1 px-3 py-1 rounded-lg border-2 text-xs font-black ${
+                      mark === "correct"
+                        ? "bg-emerald-500 border-emerald-600 text-white"
+                        : "bg-white border-emerald-300 text-emerald-700 hover:bg-emerald-50"
+                    }`}
+                  >
+                    <Check className="w-3.5 h-3.5" /> Correct
+                  </button>
+                  <button
+                    onClick={() => setMark(q.id, "incorrect")}
+                    className={`flex items-center gap-1 px-3 py-1 rounded-lg border-2 text-xs font-black ${
+                      mark === "incorrect"
+                        ? "bg-amber-500 border-amber-600 text-white"
+                        : "bg-white border-amber-300 text-amber-700 hover:bg-amber-50"
+                    }`}
+                  >
+                    <X className="w-3.5 h-3.5" /> Needs work
+                  </button>
+                </div>
+              )}
+
               {/* Answer Key Override */}
-              {(showAnswerKey || result === "incorrect" || result === "review") && (
+              {(showAnswerKey || result === "incorrect" || (isOpen && hasAnswer(q.id) && (teacherMode || mark === "incorrect"))) && (
                 <div className="pl-8 pr-4 py-2.5 bg-emerald-50 rounded-xl border border-emerald-200 text-sm text-emerald-800 space-y-1 print:bg-slate-50 print:border-slate-800 print:text-black print:p-2 print:rounded-lg print:pl-6">
                   <p className="font-extrabold flex items-center gap-1.5 print:text-[11px]">
                     <Sparkles className="w-3.5 h-3.5 text-emerald-600 shrink-0 print:text-slate-800" />
-                    {result === "review" && !showAnswerKey ? "Model Answer" : "Correct Answer"}: <span className="font-black underline">{q.correctAnswer}</span>
+                    {isOpen && !showAnswerKey ? "Model Answer" : "Correct Answer"}: <span className="font-black underline">{q.correctAnswer}</span>
                   </p>
                   <p className="text-xs text-emerald-700/95 font-medium leading-normal print:text-slate-700 print:text-[10px]">
                     {q.explanation}
@@ -842,24 +1025,33 @@ export default function ModuleWorksheet({ moduleId, moduleTitle, moduleSubtitle,
           Check My Answers
         </button>
 
-        {checked && (
+        {(checked || openMarked > 0) && (
           <div
             className={`flex flex-col gap-0.5 px-4 py-2 rounded-2xl border text-sm font-black font-display ${
               perfect ? "bg-yellow-100 border-yellow-200 text-yellow-800 animate-bounce" : "bg-sky-50 border-sky-100 text-sky-900"
             }`}
           >
-            <span>
-              {perfect ? "🙌 Double High Five! " : ""}
-              {autoCorrect} of {autoChecked.length} auto-checked answers correct
-            </span>
-            {selfCheckCount > 0 && (
-              <span className="text-xs font-bold opacity-80">
-                {selfCheckCount} open-ended question{selfCheckCount === 1 ? "" : "s"}: compare with the model answers
+            {checked && (
+              <span>
+                {perfect ? "🙌 Double High Five! " : ""}
+                {autoCorrect} of {autoChecked.length} auto-checked answers correct
               </span>
             )}
-            {unanswered > 0 && (
+            {openQs.length > 0 && (
+              <span className="text-xs font-bold opacity-80">
+                {openMarked} of {openQs.length} open-ended marked by teacher
+                {openMarked > 0 ? ` (${openCorrect} correct)` : ""}
+                {awaiting > 0 ? ` · ${awaiting} waiting for your teacher` : ""}
+              </span>
+            )}
+            {checked && unanswered > 0 && (
               <span className="text-xs font-bold opacity-80">
                 {unanswered} question{unanswered === 1 ? "" : "s"} still unanswered
+              </span>
+            )}
+            {finalized && (
+              <span>
+                Final score: {totalCorrect} of {questions.length} ({percent}%)
               </span>
             )}
           </div>
