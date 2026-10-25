@@ -24,6 +24,29 @@ export function getDaysBetween(dateStr1: string, dateStr2: string): number {
   return Math.round(diffTime / (1000 * 3600 * 24));
 }
 
+export function addDays(dateStr: string, n: number): string {
+  const d = new Date(dateStr + "T00:00:00");
+  d.setDate(d.getDate() + n);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+/**
+ * School days (Mon-Fri) strictly between two dates. Weekends never count as
+ * missed, so a class that plays Mon-Fri keeps its streak through the weekend.
+ */
+export function weekdaysBetween(from: string, to: string): number {
+  const span = getDaysBetween(from, to);
+  let count = 0;
+  for (let i = 1; i < span && i < 400; i++) {
+    const dow = new Date(addDays(from, i) + "T00:00:00").getDay();
+    if (dow !== 0 && dow !== 6) count++;
+  }
+  return count;
+}
+
 export function getDayName(dateStr: string): string {
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const d = new Date(dateStr + "T00:00:00");
@@ -69,11 +92,10 @@ export function getCurrentWeekDays(referenceDateStr: string = getTodayFormatted(
  * Evaluates the user's streak status when the app loads or wakes up.
  * Checks if streak needs protection via Streak Freeze or if it broke due to inactive days.
  */
-export function evaluateUserStreakOnLoad(progress: UserProgress): {
+export function evaluateUserStreakOnLoad(progress: UserProgress, today: string = getTodayFormatted()): {
   updatedProgress: UserProgress;
   notificationMessage?: string;
 } {
-  const today = getTodayFormatted();
   const lastActive = progress.lastActiveDate;
 
   // If no previous activity date exists, initialize with current values
@@ -81,22 +103,20 @@ export function evaluateUserStreakOnLoad(progress: UserProgress): {
     return { updatedProgress: progress };
   }
 
-  // Days since last active lesson
-  const daysDiff = getDaysBetween(lastActive, today);
+  // School days (Mon-Fri) skipped since the last lesson. Weekends are free.
+  const missedDays = weekdaysBetween(lastActive, today);
 
-  // If active today or yesterday, streak is alive and healthy!
-  if (daysDiff <= 1) {
+  // Nothing missed: the streak is alive and healthy!
+  if (missedDays === 0) {
     return { updatedProgress: progress };
   }
 
-  // User missed one or more full days (daysDiff 2 = yesterday was missed)
   const currentStreak = progress.streakCount ?? 0;
   const freezes = progress.streakFreezes ?? 0;
-  const missedDays = daysDiff - 1;
 
   if (currentStreak > 0 && freezes >= missedDays) {
     // Each missed day consumes one streak freeze
-    const yesterday = getYesterdayFormatted();
+    const yesterday = addDays(today, -1);
     const updatedProgress: UserProgress = {
       ...progress,
       streakFreezes: freezes - missedDays,
@@ -104,7 +124,7 @@ export function evaluateUserStreakOnLoad(progress: UserProgress): {
     };
     return {
       updatedProgress,
-      notificationMessage: `❄️ Streak Freeze Activated! You missed ${missedDays} day${missedDays === 1 ? "" : "s"}, and ${missedDays} streak freeze${missedDays === 1 ? "" : "s"} protected your hard-earned streak!`
+      notificationMessage: `❄️ Streak Freeze Activated! You missed ${missedDays} school day${missedDays === 1 ? "" : "s"}, and ${missedDays} streak freeze${missedDays === 1 ? "" : "s"} protected your hard-earned streak!`
     };
   } else if (currentStreak > 0) {
     // Not enough freezes to cover every missed day -> Streak resets (freezes are kept)
@@ -115,7 +135,7 @@ export function evaluateUserStreakOnLoad(progress: UserProgress): {
     };
     return {
       updatedProgress,
-      notificationMessage: `😢 Oh no! You missed ${missedDays} day${missedDays === 1 ? "" : "s"} and didn't have enough Streak Freezes, so your streak reset to 0. Finish a lesson today to start a fresh fire!`
+      notificationMessage: `😢 Oh no! You missed ${missedDays} school day${missedDays === 1 ? "" : "s"} and didn't have enough Streak Freezes, so your streak reset to 0. Finish a lesson today to start a fresh fire!`
     };
   }
 
@@ -125,12 +145,11 @@ export function evaluateUserStreakOnLoad(progress: UserProgress): {
 /**
  * Called when user completes an activity/quiz today.
  */
-export function recordActivityForToday(progress: UserProgress): {
+export function recordActivityForToday(progress: UserProgress, today: string = getTodayFormatted()): {
   updatedProgress: UserProgress;
   milestoneCoinsBonus: number;
   message: string;
 } {
-  const today = getTodayFormatted();
   const todayDayName = getDayName(today);
   const activityDates = progress.activityDates ?? [];
   const streakCalendar = progress.streakCalendar ?? [];
@@ -150,11 +169,10 @@ export function recordActivityForToday(progress: UserProgress): {
   if (!lastActive) {
     newStreakCount = 1;
   } else {
-    const daysDiff = getDaysBetween(lastActive, today);
-    if (daysDiff <= 1) {
+    if (weekdaysBetween(lastActive, today) === 0) {
       newStreakCount += 1;
     } else {
-      // Missed days
+      // Missed school days
       newStreakCount = 1;
     }
   }
