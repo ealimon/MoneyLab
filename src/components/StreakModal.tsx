@@ -85,7 +85,7 @@ export default function StreakModal({ isOpen, onClose, progress, onUpdateProgres
                   This Week's Track
                 </h4>
                 <span className="text-xs text-rose-500 font-bold flex items-center gap-1">
-                  <Zap className="w-3.5 h-3.5 fill-rose-500" /> Finish a lesson each day to light the fire!
+                  <Zap className="w-3.5 h-3.5 fill-rose-500" /> Finish a lesson on school days. Weekends are free!
                 </span>
               </div>
 
