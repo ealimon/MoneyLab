@@ -8,7 +8,7 @@ import { Module, StockState } from "../../types";
 
 interface ModuleInteractiveProps {
   module: Module;
-  onComplete: (awardedCoins: number, awardedXp: number) => void;
+  onComplete: (awardedCoins: number) => void;
   userCoins: number;
   onSpendCoins: (amount: number) => void;
 }
@@ -149,7 +149,7 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
 
   const completeSimulation = () => {
     setIsCompleted(true);
-    onComplete(module.coinReward, module.xpReward);
+    onComplete(module.coinReward);
   };
 
   // ----------------------------------------------------
@@ -998,11 +998,6 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
           <p className="text-sm text-slate-500 font-semibold">{module.subtitle}</p>
         </div>
         <div className="flex items-center gap-4 bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
-          <div className="text-center px-1">
-            <p className="text-xs font-black text-slate-400 uppercase">XP Reward</p>
-            <p className="font-bold text-base text-blue-600">+{module.xpReward} XP</p>
-          </div>
-          <div className="h-6 w-[1px] bg-slate-200" />
           <div className="text-center px-1">
             <p className="text-xs font-black text-slate-400 uppercase">Stars Reward</p>
             <p className="font-bold text-base text-yellow-500">+{module.coinReward} Stars</p>

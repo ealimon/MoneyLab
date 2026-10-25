@@ -1,7 +1,5 @@
 export interface UserProgress {
-  xp: number;
   coins: number;
-  level: number;
   completedModules: string[]; // module IDs
   badges: string[]; // badge IDs
   unlockedAvatarItems: string[]; // item IDs
@@ -42,7 +40,6 @@ export interface Module {
   description: string;
   category: "basics" | "earning" | "spending" | "saving" | "investing";
   estimatedMinutes: number;
-  xpReward: number;
   coinReward: number;
   badge: Badge;
   quizzes: QuizQuestion[];
