@@ -13,6 +13,9 @@ interface ModuleInteractiveProps {
   onSpendCoins: (amount: number) => void;
 }
 
+// Whole-dollar amounts with thousands separators ($151,431), used for every money display below
+const money = (n: number | string) => Number(n).toLocaleString("en-US");
+
 export default function ModuleInteractive({ module, onComplete, userCoins, onSpendCoins }: ModuleInteractiveProps) {
   const [gameState, setGameState] = useState<any>({});
   const [isCompleted, setIsCompleted] = useState(false);
@@ -1879,7 +1882,7 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
                           <span className="text-base">🐷</span>
                           <div>
                             <span className="block text-[10px] font-black uppercase text-emerald-600 tracking-wider">Savings</span>
-                            <span className="font-black text-emerald-950 text-xs sm:text-sm font-display">${gameState.savings || 0}</span>
+                            <span className="font-black text-emerald-950 text-xs sm:text-sm font-display">${money(gameState.savings || 0)}</span>
                           </div>
                         </div>
                       </div>
@@ -2168,18 +2171,18 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
                           <div className="h-[1px] bg-slate-200" />
                           <div className="flex justify-between font-black text-slate-900 text-sm">
                             <span>Month Cash Surplus Swept to Savings</span>
-                            <span className="text-emerald-600">+${gameState.lastMonthNet || 0}</span>
+                            <span className="text-emerald-600">+${money(gameState.lastMonthNet || 0)}</span>
                           </div>
                           {(gameState.lastInterestEarned || 0) > 0 && (
                             <div className="flex justify-between font-bold text-sky-700 bg-sky-50 px-3 py-1.5 rounded-lg">
                               <span>🐷 Bank Interest Earned on Savings (0.5%)</span>
-                              <span>+${gameState.lastInterestEarned}</span>
+                              <span>+${money(gameState.lastInterestEarned)}</span>
                             </div>
                           )}
                           <div className="h-[2px] bg-slate-200" />
                           <div className="flex justify-between font-black text-base sm:text-lg text-emerald-800 bg-emerald-100/80 border border-emerald-300 px-3 py-2 rounded-xl">
                             <span>Total Savings Account Balance</span>
-                            <span>${gameState.savings || 0}</span>
+                            <span>${money(gameState.savings || 0)}</span>
                           </div>
                         </div>
 
@@ -2225,19 +2228,19 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
                           <div className="grid grid-cols-2 gap-3 text-xs sm:text-sm font-semibold">
                             <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
                               <span className="text-slate-500 text-[10px] font-bold block uppercase font-display">Total 6-Month Income</span>
-                              <span className="text-emerald-600 font-black text-lg font-display">${gameState.totalIncome || 0}</span>
+                              <span className="text-emerald-600 font-black text-lg font-display">${money(gameState.totalIncome || 0)}</span>
                             </div>
                             <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
                               <span className="text-slate-500 text-[10px] font-bold block uppercase font-display">Total Spent on Needs</span>
-                              <span className="text-rose-600 font-black text-lg font-display">${gameState.totalNeeds || 0}</span>
+                              <span className="text-rose-600 font-black text-lg font-display">${money(gameState.totalNeeds || 0)}</span>
                             </div>
                             <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
                               <span className="text-slate-500 text-[10px] font-bold block uppercase font-display">Total Spent on Wants</span>
-                              <span className="text-pink-600 font-black text-lg font-display">${gameState.totalWants || 0}</span>
+                              <span className="text-pink-600 font-black text-lg font-display">${money(gameState.totalWants || 0)}</span>
                             </div>
                             <div className="bg-emerald-50 p-3.5 rounded-xl border border-emerald-300">
                               <span className="text-emerald-800 text-[10px] font-black block uppercase font-display">Total Emergency Savings</span>
-                              <span className="text-emerald-700 font-black text-xl font-display">${gameState.savings || 0}</span>
+                              <span className="text-emerald-700 font-black text-xl font-display">${money(gameState.savings || 0)}</span>
                             </div>
                           </div>
 
@@ -2283,7 +2286,7 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs font-semibold">
                     <span className="text-slate-700">Monthly Contribution</span>
-                    <span className="text-emerald-600">${gameState.monthlySavings}/mo</span>
+                    <span className="text-emerald-600">${money(gameState.monthlySavings)}/mo</span>
                   </div>
                   <input
                     id="slider-savings"
@@ -2397,11 +2400,11 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
                 <div className="w-full grid grid-cols-2 gap-2 text-center text-xs mt-3">
                   <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
                     <p className="text-[10px] text-slate-400 font-bold">YOUR CONTRIBUTIONS</p>
-                    <p className="font-bold text-slate-700">${gameState.totalSaved}</p>
+                    <p className="font-bold text-slate-700">${money(gameState.totalSaved)}</p>
                   </div>
                   <div className="bg-yellow-50/50 p-2 rounded-lg border border-yellow-100">
                     <p className="text-[10px] text-amber-500 font-bold">INTEREST EARNED</p>
-                    <p className="font-bold text-amber-600">${gameState.totalInterest}</p>
+                    <p className="font-bold text-amber-600">${money(gameState.totalInterest)}</p>
                   </div>
                 </div>
               </div>
@@ -2410,7 +2413,7 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
             {/* Explainer / Complete */}
             <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-4">
               <div className="text-xs text-slate-600 leading-relaxed font-medium">
-                💰 <strong>Magical Compounding Summary:</strong> You saved <strong>${gameState.totalSaved}</strong>, but because of annual interest compounding, you earned an extra <strong>${gameState.totalInterest}</strong> for a total of <strong>${gameState.totalPortfolio}</strong>! That's free money just for letting your savings grow!
+                💰 <strong>Magical Compounding Summary:</strong> You saved <strong>${money(gameState.totalSaved)}</strong>, but because of annual interest compounding, you earned an extra <strong>${money(gameState.totalInterest)}</strong> for a total of <strong>${money(gameState.totalPortfolio)}</strong>! That's free money just for letting your savings grow!
               </div>
               <button
                 id="m4-complete"
@@ -2645,8 +2648,8 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
                   <div className="bg-green-950 text-emerald-400 p-4 rounded-lg border border-green-800 min-h-[100px] flex flex-col justify-between text-left shadow-inner">
                     <p className="text-xs text-emerald-500 font-bold">ATM TERMINAL #808</p>
                     <div className="my-2">
-                      <p className="text-sm font-semibold">Checking: <span className="font-bold">${gameState.checkingBalance}</span></p>
-                      <p className="text-sm font-semibold">Cash Wallet: <span className="font-bold">${gameState.cashWallet}</span></p>
+                      <p className="text-sm font-semibold">Checking: <span className="font-bold">${money(gameState.checkingBalance)}</span></p>
+                      <p className="text-sm font-semibold">Cash Wallet: <span className="font-bold">${money(gameState.cashWallet)}</span></p>
                     </div>
                     <p className="text-xs text-emerald-600 italic">
                       {gameState.atmStage === "insert" && "Check deposited! Insert Card to access."}
@@ -2759,12 +2762,12 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
                       </div>
                       <div className="flex justify-between font-medium text-slate-600">
                         <span>Total Interest Paid</span>
-                        <span className="font-bold text-rose-500 bg-rose-50 px-2 py-0.5 rounded-md">${gameState.totalInterestPaid}</span>
+                        <span className="font-bold text-rose-500 bg-rose-50 px-2 py-0.5 rounded-md">${money(gameState.totalInterestPaid)}</span>
                       </div>
                       <div className="h-[1px] bg-slate-100" />
                       <div className="flex justify-between font-bold text-sm text-slate-800">
                         <span>Remaining Credit Card Debt</span>
-                        <span className={gameState.debt > 0 ? "text-rose-600" : "text-emerald-600"}>${gameState.debt}</span>
+                        <span className={gameState.debt > 0 ? "text-rose-600" : "text-emerald-600"}>${money(gameState.debt)}</span>
                       </div>
                     </div>
 
@@ -2801,7 +2804,7 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
                           </span>
                           <p className="text-xs text-rose-700 font-bold bg-rose-50 px-3 py-1.5 rounded-lg border border-rose-100 leading-relaxed">
                             {gameState.months > 0 
-                              ? `Giant Coin Dragon: Oh no! The Debt Monster grew! You paid $${gameState.totalInterestPaid} in interest and STILL owe $${gameState.debt}!`
+                              ? `Giant Coin Dragon: Oh no! The Debt Monster grew! You paid $${money(gameState.totalInterestPaid)} in interest and STILL owe $${money(gameState.debt)}!`
                               : "Sleeping Dragon: It starts small, but interest compounding makes it grow fast!"
                             }
                           </p>
@@ -2842,7 +2845,7 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
               </div>
               <div className="bg-white border border-indigo-200 px-3 py-2 rounded-lg text-center shrink-0">
                 <p className="text-xs text-slate-400 uppercase font-black">YOUR CAPITAL</p>
-                <p className="text-sm font-black text-indigo-600">${gameState.portfolioValue}</p>
+                <p className="text-sm font-black text-indigo-600">${money(gameState.portfolioValue)}</p>
               </div>
             </div>
 
@@ -2852,7 +2855,7 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
                 <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
                   <div className="flex justify-between items-center pb-2 border-b border-slate-100 mb-3 text-xs">
                     <span className="font-bold text-slate-500">Day: {gameState.day}/5</span>
-                    <span className="font-bold text-slate-600 bg-slate-50 px-2 py-0.5 rounded border">Cash Wallet: ${gameState.cash}</span>
+                    <span className="font-bold text-slate-600 bg-slate-50 px-2 py-0.5 rounded border">Cash Wallet: ${money(gameState.cash)}</span>
                   </div>
 
                   <div className="space-y-3">
@@ -2869,7 +2872,7 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
                           </div>
 
                           <div className="flex items-center gap-4 self-end sm:self-center">
-                            <span className="font-black text-sm text-indigo-600">${stock.price}</span>
+                            <span className="font-black text-sm text-indigo-600">${money(stock.price)}</span>
                             <div className="flex items-center gap-1.5">
                               <button
                                 id={`buy-${stock.symbol.toLowerCase()}`}
