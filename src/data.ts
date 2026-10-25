@@ -8,7 +8,6 @@ export const MODULES: Module[] = [
     description: "Discover why trading apples for a skateboard is so hard, and how cash, coins, and currency solved this ancient puzzle!",
     category: "basics",
     estimatedMinutes: 5,
-    xpReward: 100,
     coinReward: 50,
     badge: {
       id: "b1",
@@ -115,7 +114,6 @@ export const MODULES: Module[] = [
     description: "Explore different jobs, learn how salaries work, and understand the mystery of why your virtual paycheck gets smaller before you spend it!",
     category: "earning",
     estimatedMinutes: 6,
-    xpReward: 120,
     coinReward: 60,
     badge: {
       id: "b2",
@@ -222,7 +220,6 @@ export const MODULES: Module[] = [
     description: "Learn the legendary 50/30/20 rule to divide your money so you can afford what you need, get what you want, and save for the future!",
     category: "spending",
     estimatedMinutes: 6,
-    xpReward: 120,
     coinReward: 60,
     badge: {
       id: "b3",
@@ -329,7 +326,6 @@ export const MODULES: Module[] = [
     description: "Watch how a single dollar can snowball and multiply over time through compound interest. The ultimate financial superpower!",
     category: "saving",
     estimatedMinutes: 5,
-    xpReward: 110,
     coinReward: 55,
     badge: {
       id: "b4",
@@ -436,7 +432,6 @@ export const MODULES: Module[] = [
     description: "Learn how to calculate cost-per-ounce, decode confusing coupons, and dodge sneaky store tricks designed to empty your wallet!",
     category: "spending",
     estimatedMinutes: 6,
-    xpReward: 120,
     coinReward: 60,
     badge: {
       id: "b5",
@@ -543,7 +538,6 @@ export const MODULES: Module[] = [
     description: "Crack the code of how checking and savings accounts work, write your very first virtual paper check, and run the ATM!",
     category: "basics",
     estimatedMinutes: 6,
-    xpReward: 130,
     coinReward: 65,
     badge: {
       id: "b6",
@@ -650,7 +644,6 @@ export const MODULES: Module[] = [
     description: "Credit cards let you buy today, but can invite a greedy 'Interest Monster' to double your bills! Master credit safety.",
     category: "spending",
     estimatedMinutes: 7,
-    xpReward: 140,
     coinReward: 70,
     badge: {
       id: "b7",
@@ -757,7 +750,6 @@ export const MODULES: Module[] = [
     description: "Buy shares of tomorrow's companies! Trade virtual stocks, react to crazy breaking news, and watch your portfolio blast off!",
     category: "investing",
     estimatedMinutes: 7,
-    xpReward: 150,
     coinReward: 75,
     badge: {
       id: "b8",
@@ -864,7 +856,6 @@ export const MODULES: Module[] = [
     description: "Crack open a real paycheck stub! Discover where your tax money goes (like parks, schools, and roads) and see taxes at work.",
     category: "earning",
     estimatedMinutes: 6,
-    xpReward: 130,
     coinReward: 65,
     badge: {
       id: "b9",
@@ -971,7 +962,6 @@ export const MODULES: Module[] = [
     description: "Learn how to use your wealth to make a difference. Donate your accumulated Stars to rebuild and upgrade your community!",
     category: "saving",
     estimatedMinutes: 5,
-    xpReward: 120,
     coinReward: 60,
     badge: {
       id: "b10",

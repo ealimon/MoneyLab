@@ -30,9 +30,7 @@ const STORAGE_KEY = "moneylab_progress";
 const LEGACY_STORAGE_KEY = "finance_quest_academy_progress"; // pre-rename saves
 
 const DEFAULT_PROGRESS: UserProgress = {
-  xp: 0,
   coins: 100, // Start with a 100 coin sign-up bonus!
-  level: 1,
   completedModules: [],
   badges: [],
   unlockedAvatarItems: [],
@@ -127,9 +125,6 @@ export default function App() {
     }
   };
 
-  // Helper to calculate next level threshold
-  const getXpThreshold = (lvl: number) => lvl * 200;
-
   const activeModule = MODULES.find(m => m.id === selectedModuleId) || MODULES[0];
   const activeAdventure = ADVENTURE_MODULES.find(m => m.id === selectedModuleId) || ADVENTURE_MODULES[0];
 
@@ -189,26 +184,15 @@ export default function App() {
     // Record today's activity in streak engine
     const { updatedProgress: streakProgress, milestoneCoinsBonus } = recordActivityForToday(progress);
 
-    // Module XP/Star rewards are paid once; replays only count toward the daily streak
-    const moduleXp = isAlreadyCompleted ? 0 : activeModule.xpReward;
+    // Module Star rewards are paid once; replays only count toward the daily streak
     const moduleCoins = isAlreadyCompleted ? 0 : activeModule.coinReward;
     setLastQuizWasRepeat(isAlreadyCompleted);
 
-    // Accumulate rewards
-    let newXp = streakProgress.xp + moduleXp;
-    let newCoins = streakProgress.coins + moduleCoins + milestoneCoinsBonus;
-    let newLevel = streakProgress.level;
+    const newCoins = streakProgress.coins + moduleCoins + milestoneCoinsBonus;
 
-    while (newXp >= getXpThreshold(newLevel)) {
-      newXp -= getXpThreshold(newLevel);
-      newLevel += 1;
-    }
-    
     saveProgress({
       ...streakProgress,
-      xp: newXp,
       coins: newCoins,
-      level: newLevel,
       completedModules: updatedCompleted,
       badges: updatedBadges
     });
@@ -669,8 +653,8 @@ export default function App() {
 
                       <div className="bg-emerald-100 border-2 border-black rounded-2xl py-3 px-5 text-sm font-black text-emerald-950 inline-block font-display shadow-[2px_2px_0px_0px_#000]">
                         {lastQuizWasRepeat
-                          ? "Replay complete! Stars and XP are only awarded the first time."
-                          : `+${activeModule.coinReward} Stars • +${activeModule.xpReward} XP Awarded!`}
+                          ? "Replay complete! Stars are only awarded the first time."
+                          : `+${activeModule.coinReward} Stars Awarded!`}
                       </div>
 
                       <div className="flex flex-col gap-3 pt-2">
