@@ -141,6 +141,8 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
     } else if (module.id === "m10") {
       // Charity/Giving
       setGameState({
+        plan: { shelter: 0, foodBank: 0, forest: 0 }, // Stars set aside for each charity, not spent until "Send"
+        sent: false,
         shelterDonated: 0,
         foodBankDonated: 0,
         forestDonated: 0,
@@ -972,21 +974,38 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
   // ----------------------------------------------------
   // MODULE 10: PHILANTHROPY / CHARITY
   // ----------------------------------------------------
-  const donateCoins = (charity: "shelter" | "foodBank" | "forest", amount: number) => {
-    if (userCoins < amount) {
-      alert("Hoot! You don't have enough earned Stars for this donation yet. Keep completing modules to earn more Stars!");
-      return;
-    }
-    onSpendCoins(amount);
+  type Charity = "shelter" | "foodBank" | "forest";
+  const GIFT_STEP = 10;
+
+  // Plan a gift: nothing is spent until the student presses "Send my gift", so mistakes are easy to fix.
+  const adjustGift = (charity: Charity, delta: number) => {
     setGameState((prev: any) => {
-      const itemKey = `${charity}Donated` as const;
-      return {
-        ...prev,
-        [itemKey]: (prev[itemKey] || 0) + amount,
-        spentCoins: prev.spentCoins + amount,
-        badgeEarned: true
-      };
+      if (prev.sent) return prev;
+      const plan = prev.plan || { shelter: 0, foodBank: 0, forest: 0 };
+      const total = plan.shelter + plan.foodBank + plan.forest;
+      if (delta > 0 && total + delta > userCoins) return prev;
+      return { ...prev, plan: { ...plan, [charity]: Math.max(0, plan[charity] + delta) } };
     });
+  };
+
+  const clearGift = () => {
+    setGameState((prev: any) => (prev.sent ? prev : { ...prev, plan: { shelter: 0, foodBank: 0, forest: 0 } }));
+  };
+
+  const sendGift = () => {
+    const plan = gameState.plan || { shelter: 0, foodBank: 0, forest: 0 };
+    const total = plan.shelter + plan.foodBank + plan.forest;
+    if (gameState.sent || total <= 0 || total > userCoins) return;
+    onSpendCoins(total);
+    setGameState((prev: any) => ({
+      ...prev,
+      sent: true,
+      shelterDonated: plan.shelter,
+      foodBankDonated: plan.foodBank,
+      forestDonated: plan.forest,
+      spentCoins: total,
+      badgeEarned: true
+    }));
   };
 
   return (
@@ -3195,96 +3214,117 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
         )}
 
         {/* MODULE 10: GIVING & CHARITY */}
-        {module.id === "m10" && (
+        {module.id === "m10" && (() => {
+          const plan = gameState.plan || { shelter: 0, foodBank: 0, forest: 0 };
+          const planned = plan.shelter + plan.foodBank + plan.forest;
+          const sent = !!gameState.sent;
+          const startingStars = sent ? userCoins + gameState.spentCoins : userCoins;
+          const gift = sent ? gameState.spentCoins : planned;
+          const keep = sent ? userCoins : userCoins - planned;
+          const canGive = startingStars >= GIFT_STEP;
+          const charities: Array<{ key: Charity; name: string; emoji: string; blurb: string; donated: number }> = [
+            { key: "shelter", name: "Animal Shelter", emoji: "🐶", blurb: "Rescues puppies and kitties.", donated: gameState.shelterDonated || 0 },
+            { key: "foodBank", name: "Community Food Bank", emoji: "🍎", blurb: "Feeds families in need.", donated: gameState.foodBankDonated || 0 },
+            { key: "forest", name: "Eco Conservation", emoji: "🌲", blurb: "Plants trees and saves wildlife.", donated: gameState.forestDonated || 0 },
+          ];
+          return (
           <div className="space-y-6">
             <div className="bg-pink-50 border border-pink-100 rounded-xl p-4 text-xs font-medium text-pink-800">
-              💖 <strong>The Community Spark:</strong> Give back! Choose a worthy local charity to donate your real accumulated Stars to. Each donation helps upgrade our local neighborhood assets!
+              💖 <strong>The Community Spark:</strong> Give back! Decide how to share the Stars you've earned. Use <strong>+</strong> and <strong>−</strong> to plan your gift ({GIFT_STEP} Stars at a time), then press <strong>Send my gift</strong>. You can change your mind until you send.
+            </div>
+
+            {/* How many Stars do I have? */}
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-sm">
+                <p className="text-xs font-black text-slate-400 uppercase">Your Stars</p>
+                <p className="text-xl font-black text-amber-600">⭐ {money(startingStars)}</p>
+              </div>
+              <div className="bg-white border border-pink-200 rounded-xl p-3 shadow-sm">
+                <p className="text-xs font-black text-slate-400 uppercase">{sent ? "You gave" : "Your gift"}</p>
+                <p className="text-xl font-black text-pink-600">{money(gift)}</p>
+              </div>
+              <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-sm">
+                <p className="text-xs font-black text-slate-400 uppercase">You keep</p>
+                <p className="text-xl font-black text-emerald-600">{money(keep)}</p>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Charity A */}
-              <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col justify-between text-center space-y-3">
-                <span className="text-4xl">🐶</span>
-                <div>
-                  <h4 className="font-bold text-slate-800 text-sm">Animal Shelter</h4>
-                  <p className="text-xs text-slate-500 font-semibold">Rescues puppies and kitties.</p>
-                  <p className="text-xs font-bold text-pink-600 mt-2">Donated: {gameState.shelterDonated || 0} Stars</p>
+              {charities.map((c) => (
+                <div key={c.key} className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col justify-between text-center space-y-3">
+                  <span className="text-4xl">{c.emoji}</span>
+                  <div>
+                    <h4 className="font-bold text-slate-800 text-sm">{c.name}</h4>
+                    <p className="text-xs text-slate-500 font-semibold">{c.blurb}</p>
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-center gap-3">
+                      <button
+                        id={`gift-${c.key}-minus`}
+                        aria-label={`Give ${GIFT_STEP} fewer Stars to ${c.name}`}
+                        disabled={sent || plan[c.key] <= 0}
+                        onClick={() => adjustGift(c.key, -GIFT_STEP)}
+                        className="w-9 h-9 rounded-lg bg-pink-100 hover:bg-pink-200 text-pink-700 font-black flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                      >
+                        <Minus className="w-4 h-4" />
+                      </button>
+                      <span className="text-2xl font-black text-pink-600 w-16 text-center">{money(sent ? c.donated : plan[c.key])}</span>
+                      <button
+                        id={`gift-${c.key}-plus`}
+                        aria-label={`Give ${GIFT_STEP} more Stars to ${c.name}`}
+                        disabled={sent || keep < GIFT_STEP}
+                        onClick={() => adjustGift(c.key, GIFT_STEP)}
+                        className="w-9 h-9 rounded-lg bg-pink-500 hover:bg-pink-600 text-white font-black flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <p className="text-xs font-bold text-pink-600 mt-2">{sent ? "Stars donated" : "Stars to give"}</p>
+                  </div>
                 </div>
-                <div className="flex gap-1">
-                  <button
-                    id="donate-shelter-20"
-                    onClick={() => donateCoins("shelter", 20)}
-                    className="flex-1 bg-pink-100 hover:bg-pink-200 text-pink-700 text-xs font-black py-1.5 rounded-lg transition-all"
-                  >
-                    Give 20 ⭐
-                  </button>
-                  <button
-                    id="donate-shelter-50"
-                    onClick={() => donateCoins("shelter", 50)}
-                    className="flex-1 bg-pink-500 hover:bg-pink-600 text-white text-xs font-black py-1.5 rounded-lg transition-all"
-                  >
-                    Give 50 ⭐
-                  </button>
-                </div>
-              </div>
-
-              {/* Charity B */}
-              <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col justify-between text-center space-y-3">
-                <span className="text-4xl">🍎</span>
-                <div>
-                  <h4 className="font-bold text-slate-800 text-sm">Community Food Bank</h4>
-                  <p className="text-xs text-slate-500 font-semibold">Feeds families in need.</p>
-                  <p className="text-xs font-bold text-pink-600 mt-2">Donated: {gameState.foodBankDonated || 0} Stars</p>
-                </div>
-                <div className="flex gap-1">
-                  <button
-                    id="donate-food-20"
-                    onClick={() => donateCoins("foodBank", 20)}
-                    className="flex-1 bg-pink-100 hover:bg-pink-200 text-pink-700 text-xs font-black py-1.5 rounded-lg transition-all"
-                  >
-                    Give 20 ⭐
-                  </button>
-                  <button
-                    id="donate-food-50"
-                    onClick={() => donateCoins("foodBank", 50)}
-                    className="flex-1 bg-pink-500 hover:bg-pink-600 text-white text-xs font-black py-1.5 rounded-lg transition-all"
-                  >
-                    Give 50 ⭐
-                  </button>
-                </div>
-              </div>
-
-              {/* Charity C */}
-              <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col justify-between text-center space-y-3">
-                <span className="text-4xl">🌲</span>
-                <div>
-                  <h4 className="font-bold text-slate-800 text-sm">Eco Conservation</h4>
-                  <p className="text-xs text-slate-500 font-semibold">Plants trees and saves wildlife.</p>
-                  <p className="text-xs font-bold text-pink-600 mt-2">Donated: {gameState.forestDonated || 0} Stars</p>
-                </div>
-                <div className="flex gap-1">
-                  <button
-                    id="donate-eco-20"
-                    onClick={() => donateCoins("forest", 20)}
-                    className="flex-1 bg-pink-100 hover:bg-pink-200 text-pink-700 text-xs font-black py-1.5 rounded-lg transition-all"
-                  >
-                    Give 20 ⭐
-                  </button>
-                  <button
-                    id="donate-eco-50"
-                    onClick={() => donateCoins("forest", 50)}
-                    className="flex-1 bg-pink-500 hover:bg-pink-600 text-white text-xs font-black py-1.5 rounded-lg transition-all"
-                  >
-                    Give 50 ⭐
-                  </button>
-                </div>
-              </div>
+              ))}
             </div>
 
-            {gameState.badgeEarned && (
+            {!sent && canGive && (
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  id="gift-clear"
+                  onClick={clearGift}
+                  disabled={planned === 0}
+                  className="sm:w-48 bg-white hover:bg-slate-50 border-2 border-slate-200 text-slate-600 font-bold py-2.5 rounded-xl text-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                >
+                  Clear my choices
+                </button>
+                <button
+                  id="gift-send"
+                  onClick={sendGift}
+                  disabled={planned === 0}
+                  className="flex-1 bg-pink-500 hover:bg-pink-600 text-white font-black py-2.5 rounded-xl shadow-md text-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                >
+                  {planned === 0 ? "Pick an amount to give" : `Send my gift (${money(planned)} Stars)`}
+                </button>
+              </div>
+            )}
+
+            {!sent && !canGive && (
+              <div className="space-y-4">
+                <div className="bg-sky-50 text-sky-800 p-4 rounded-xl border border-sky-100 text-xs font-medium text-center">
+                  💡 You have fewer than {GIFT_STEP} Stars right now, so there's nothing to give this time. Giving your time and skills counts too! You can finish the lesson, and come back after you've earned more Stars.
+                </div>
+                <button
+                  id="m10-complete"
+                  onClick={completeSimulation}
+                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-sm"
+                >
+                  Complete Giving Lesson <Check className="w-5 h-5" />
+                </button>
+              </div>
+            )}
+
+            {sent && (
               <div className="space-y-4">
                 <div className="bg-emerald-50 text-emerald-800 p-4 rounded-xl border border-emerald-100 text-xs font-medium text-center">
-                  🌟 <strong>Generosity Unleashed!</strong> You've donated a total of <strong>{gameState.spentCoins} Stars</strong> to critical civic sectors! You make our community a better place.
+                  🌟 <strong>Generosity Unleashed!</strong> You gave <strong>{money(gameState.spentCoins)} Stars</strong> to your community and kept <strong>{money(userCoins)}</strong>. Your gift is on its way!
                 </div>
                 <button
                   id="m10-complete"
@@ -3296,7 +3336,8 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
               </div>
             )}
           </div>
-        )}
+          );
+        })()}
       </div>
     </div>
   );
