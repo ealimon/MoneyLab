@@ -128,6 +128,7 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
         cash: 500,
         shares: { CHOCO: 0, DINO: 0, ROBO: 0, MEME: 0 },
         day: 1,
+        usedNews: [] as number[], // news events already shown this game (no repeats)
         news: "Welcome to Wall Street! Click Next Day to watch stock charts react to the news!",
         portfolioValue: 500
       });
@@ -920,9 +921,14 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
       { text: "General market slowdown. Prices consolidation across sectors.", stocks: { CHOCO: -0.05, DINO: -0.04, ROBO: -0.08, MEME: -0.15 } }
     ];
 
-    const selectedNews = marketNews[Math.floor(Math.random() * marketNews.length)];
-
     setGameState((prev: any) => {
+      // Each news event happens at most once per game, so every student sees different events
+      let used: number[] = prev.usedNews || [];
+      if (used.length >= marketNews.length) used = [];
+      const pool = marketNews.map((_, i) => i).filter((i) => !used.includes(i));
+      const pick = pool[Math.floor(Math.random() * pool.length)];
+      const selectedNews = marketNews[pick];
+
       const nextDay = prev.day + 1;
       const updatedStocks = prev.stocks.map((stock: StockState) => {
         const changeFactor = selectedNews.stocks[stock.symbol as keyof typeof selectedNews.stocks] || 0;
@@ -945,6 +951,7 @@ export default function ModuleInteractive({ module, onComplete, userCoins, onSpe
         ...prev,
         stocks: updatedStocks,
         day: nextDay,
+        usedNews: [...used, pick],
         news: selectedNews.text,
         portfolioValue: Math.round(portfolioVal)
       };
